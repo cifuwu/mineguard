@@ -42,7 +42,9 @@ function SidebarContent(props: {
           <Links mini={mini} hovered={hovered} routes={routes} />
         </Box>
       </Stack>
+      {/*
 
+      */}
       <Flex
         ps="20px"
         pe={{ md: '20px', '2xl': '20px' }}
@@ -51,7 +53,7 @@ function SidebarContent(props: {
         justifyContent={'center'}
         alignItems="center"
       >
-        <SidebarCard mini={mini} hovered={hovered} />
+        {/*<SidebarCard mini={mini} hovered={hovered} />*/}
       </Flex>
       <Flex mt="75px" mb="56px" justifyContent="center" alignItems="center">
         <Avatar
