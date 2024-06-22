@@ -16,6 +16,7 @@ export function SidebarBrand(props: { mini: boolean; hovered: boolean }) {
         h="26px"
         w="175px"
         my="32px"
+        ml="25px"
         color={logoColor}
         display={
           mini === false
@@ -37,7 +38,7 @@ export function SidebarBrand(props: { mini: boolean; hovered: boolean }) {
         fontWeight="800"
         color={logoColor}
       >
-        H
+        M
       </Text>
       <HSeparator mb="20px" />
     </Flex>

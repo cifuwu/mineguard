@@ -83,9 +83,9 @@ export default function AdminLayout({
         >
           {children}
         </Box>
-        <Box>
+        {/*<Box>
           <Footer />
-        </Box>
+        </Box>*/}
       </Box>
     </Box>
   );

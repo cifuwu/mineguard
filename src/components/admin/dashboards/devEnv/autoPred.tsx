@@ -1,30 +1,10 @@
 /* eslint-disable */
 
-import {
-    Box,
-    Flex,
-    Button,
-    Icon,
-    Table,
-    Tbody,
-    Td,
-    Text,
-    Th,
-    Thead,
-    Tr,
-    useColorModeValue,
-  } from '@chakra-ui/react';
-  import {
-    createColumnHelper,
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-  } from '@tanstack/react-table';
-  import { MdOutlineCalendarToday } from 'react-icons/md';
+  import { Box, Flex, Button, Icon, Table, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, } from '@chakra-ui/react';
+  import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, } from '@tanstack/react-table';
   // Custom components
   import Card from 'components/card/Card';
   import * as React from 'react';
-  import IconBox from 'components/icons/IconBox';
   // Assets
   import { ImCog } from "react-icons/im";
 
@@ -39,13 +19,46 @@ import {
   // const columns = columnsDataCheck;
   export default function AutoPred(props: { tableData: any }) {
     const { tableData } = props;
-    const iconColor = useColorModeValue('brand.500', 'white');
-    const iconBoxBg = useColorModeValue('secondaryGray.300', 'navy.700');
     const textColor = useColorModeValue('secondaryGray.900', 'white');
     const textColorSecondary = useColorModeValue('secondaryGray.600', 'white');
-    const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
     const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
     let defaultData = tableData;
+
+    const convertFrequency = (seconds: number) => {
+      const days = Math.floor(seconds / (24 * 3600));
+      const hours = Math.floor((seconds % (24 * 3600)) / 3600);
+      return { days, hours };
+    };
+
+    const formatDate = (isoDate: string) => {
+      const date = new Date(isoDate);
+      return date.toLocaleDateString('es-ES');
+    };
+  
+    const formatTime = (isoDate: string) => {
+      const date = new Date(isoDate);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const { days, hours } = convertFrequency(tableData.frequency);
+    const processedData: RowObj[] = [
+      {
+        name: 'Fecha última predicción',
+        fecha: formatDate(tableData.lastPredDate),
+        hora: formatTime(tableData.lastPredDate),
+      },
+      {
+        name: 'Fecha siguiente predicción',
+        fecha: formatDate(tableData.nextPredDate),
+        hora: formatTime(tableData.nextPredDate),
+      },
+      {
+        name: 'Frecuencia',
+        fecha: `${days} Días`,
+        hora: `${hours} Horas`,
+      },
+    ];
+
     const columns = [
       columnHelper.accessor('name', {
         id: 'name',
@@ -100,7 +113,7 @@ import {
         ),
       }),
     ];
-    const [data, setData] = React.useState(() => [...defaultData]);
+    const [data, setData] = React.useState(() => [...processedData]);
     const table = useReactTable({
       data,
       columns,
