@@ -1,7 +1,7 @@
 'use client'
 /* eslint-disable */
 
-import { Box, Flex, Table, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, Table, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, Switch } from '@chakra-ui/react';
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import * as React from 'react';
 import { useEffect } from 'react';
@@ -23,6 +23,18 @@ const columnHelper = createColumnHelper<RowObj>();
 export default function MaintenanceTable({ tableData, truckName, truckDate }: { tableData: RowObj[], truckName: string, truckDate: string }) {
   const textColor = useColorModeValue('navy.700', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+
+  const [data, setData] = React.useState<RowObj[]>([]);
+  
+  useEffect(() => {
+    setData(tableData);
+  }, [tableData]);
+  
+  const handleSwitchChange = (index: number) => {
+    const newData = [...data];
+    newData[index].done = !newData[index].done;
+    setData(newData);
+  };
 
   const columns = [
     columnHelper.accessor('component', {
@@ -72,18 +84,16 @@ export default function MaintenanceTable({ tableData, truckName, truckDate }: { 
         </Text>
       ),
       cell: (info) => (
-        <Text color={textColor} fontSize="md" fontWeight="500">
+        <Switch
+          isChecked={info.getValue()}
+          onChange={() => handleSwitchChange(info.row.index)}
+        />
+        /*<Text color={textColor} fontSize="md" fontWeight="500">
           {info.getValue() ? 'Sí' : 'No'}
-        </Text>
+        </Text>*/
       ),
     }),
   ];
-
-  const [data, setData] = React.useState<RowObj[]>([]);
-
-  useEffect(() => {
-    setData(tableData);
-  }, [tableData]);
 
   const table = useReactTable({
     data,

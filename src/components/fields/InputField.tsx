@@ -35,7 +35,7 @@ export default function Default(props: {
 				type={type}
 				id={id}
 				fontWeight='500'
-				variant='main'
+				//variant='main'
 				placeholder={placeholder}
 				_placeholder={{ fontWeight: '400', color: 'secondaryGray.600' }}
 				h='44px'

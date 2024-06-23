@@ -12,7 +12,7 @@ import { Box, Flex, Grid, useColorModeValue } from '@chakra-ui/react';
 
 const jsonData = [
   {
-    date: "2024-06-19T00:00:00.000Z",
+    date: "2024-06-19T00:00:00.000-04:00",
     trucks: [
       {
         truckID: 0,
@@ -64,7 +64,7 @@ const jsonData = [
     ]
   },
   {
-    date: "2024-06-20T00:00:00.000Z",
+    date: "2024-06-20T00:00:00.000-04:00",
     trucks: [
       {
         truckID: 5,

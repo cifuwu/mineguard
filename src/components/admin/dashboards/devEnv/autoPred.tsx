@@ -4,6 +4,7 @@
   import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, } from '@tanstack/react-table';
   // Custom components
   import Card from 'components/card/Card';
+  import ModalConfiguracion from 'components/admin/dashboards/devEnv/configModal';
   import * as React from 'react';
   // Assets
   import { ImCog } from "react-icons/im";
@@ -120,6 +121,20 @@
       getCoreRowModel: getCoreRowModel(),
       debugTable: true,
     });
+
+    // Estado para controlar la apertura del modal de configuración
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+    // Función para abrir el modal
+    const handleOpenModal = () => {
+      setIsModalOpen(true);
+    };
+
+    // Función para cerrar el modal
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+    };
+
     return (
       <Card
         flexDirection="column"
@@ -142,14 +157,15 @@
             fontWeight="500"
             color={textColorSecondary}
             borderRadius="7px"
+            onClick={handleOpenModal}
             >
-          <Icon
-            as={ImCog}
-            color={textColorSecondary}
-            me="4px"
-          />
-          Configurar
-        </Button>
+            <Icon
+              as={ImCog}
+              color={textColorSecondary}
+              me="4px"
+            />
+            Configurar
+          </Button>
         </Flex>
         <Box>
           <Table variant="simple" color="gray.500" mt="12px">
@@ -212,6 +228,7 @@
             </Tbody>
           </Table>
         </Box>
+      <ModalConfiguracion isOpen={isModalOpen} onClose={handleCloseModal} />
       </Card>
     );
   }
