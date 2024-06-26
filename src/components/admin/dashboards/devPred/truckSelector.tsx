@@ -13,11 +13,15 @@ const TruckSelector = ({ trucks, selectedTruck, onSelectTruck }) => {
   return (
     <VStack
       align="flex-start"
-      spacing="4"
+      spacing="3"
       w="100%"
       maxH="300px"
       overflowY="auto"
     >
+      <Text fontSize="md" fontWeight="bold" mb="4">
+        Selección Camión
+      </Text>
+
       {trucks.map((truck) => (
         <Box
           key={truck.id}
@@ -26,7 +30,8 @@ const TruckSelector = ({ trucks, selectedTruck, onSelectTruck }) => {
           cursor="pointer"
           onClick={() => handleTruckSelect(truck.id)}
           bg={selectedTruck === truck.id ? selectedBgColor : bgColor}
-          borderRadius="md"
+          boxShadow="sm"
+          borderRadius="xl"
           borderWidth="1px"
           borderColor="gray.200"
           _hover={{ bg: selectedTruck !== truck.id && selectedBgColor }}
@@ -43,4 +48,27 @@ const TruckSelector = ({ trucks, selectedTruck, onSelectTruck }) => {
   );
 };
 
-export default TruckSelector;
+const TruckSelectorContainer = ({ trucks, selectedTruck, onSelectTruck }) => {
+  const containerBgColor = useColorModeValue('gray.50', 'gray.800');
+
+  return (
+    <Box
+      bg={containerBgColor}
+      borderRadius="xl"
+      p={4}
+      boxShadow="md"
+      w="100%"
+      maxW="sm"
+      mx="auto"
+      my={4}
+    >
+      <TruckSelector
+        trucks={trucks}
+        selectedTruck={selectedTruck}
+        onSelectTruck={onSelectTruck}
+      />
+    </Box>
+  );
+};
+
+export default TruckSelectorContainer;

@@ -8,7 +8,7 @@ const PredictionGenerator = ({ selectedComponents, onGeneratePrediction }) => {
 
   return (
     <Flex direction="column" w="100%">
-      <Text fontSize="xl" fontWeight="bold" mb="4">
+      <Text fontSize="md" fontWeight="bold" mb="4">
         Componentes seleccionados:
       </Text>
       <Flex direction="column" w="100%">
