@@ -1,17 +1,9 @@
 # mineguard
 
-Stack tecnologico 
 
-### 1. Python
-### 2. Pandas
-### 3. NumPy
-### 4. scikit-learn
-### 5. TensorFlow/Keras
-### 6. PyTorch
-### 7. XGBoost
-### 8. LightGBM
-### 9. Optuna
-### 10. Hyperopt
-### 11. Matplotlib
-### 12. Seaborn
-### 13. Jupyter Notebook
+Instalar Dependencias desde requerimientos.txt
+Primero, crea y activa un entorno virtual en el nuevo sistema, y luego ejecuta:
+
+# pip install -r requirements.txt
+Esto instalará todas las bibliotecas enumeradas en el archivo requirements.txt en tu entorno virtual.
+
