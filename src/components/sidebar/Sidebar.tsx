@@ -57,11 +57,9 @@ function Sidebar(props: { routes: IRoute[]; [x: string]: any }) {
       minH="100%"
       onMouseEnter={() => {
         setHovered(true);
-        console.log(mini);
       }}
       onMouseLeave={() => {
         setHovered(false);
-        console.log(mini);
       }}
     >
       <Box

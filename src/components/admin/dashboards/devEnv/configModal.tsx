@@ -25,6 +25,8 @@ const ModalConfiguracion = ({ isOpen, onClose, }) => {
     let frecuenciaSegundos: number;
     if (unidadFrecuencia === 'horas') {
       frecuenciaSegundos = parseInt(frecuencia)*3600;
+    } else if (unidadFrecuencia === 'minutos') {
+      frecuenciaSegundos = parseInt(frecuencia)*60;
     } else {
       frecuenciaSegundos = parseInt(frecuencia)*86400;
     }
@@ -95,6 +97,7 @@ const ModalConfiguracion = ({ isOpen, onClose, }) => {
                         </FormLabel>
                         <Select fontSize='sm' id='frequency' h='44px' maxH='44px' me='20px' defaultValue='horas'
                           onChange={(e) => setUnidadFrecuencia(e.target.value)}>
+                            <option value='minutos'>Minutos</option>
                             <option value='horas'>Horas</option>
                             <option value='dias'>Días</option>
                         </Select>

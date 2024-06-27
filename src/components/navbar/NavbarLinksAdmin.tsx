@@ -47,6 +47,10 @@ export default function HeaderLinks(props: { secondary: boolean }) {
   );
   const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
 
+  const handleButtonClick = (event) => {
+    event.preventDefault();
+  };
+
   return (
     <Flex
       w={{ sm: '100%', md: 'auto' }}
@@ -104,7 +108,7 @@ export default function HeaderLinks(props: { secondary: boolean }) {
       </Flex>
       <SidebarResponsive routes={routes} />
       <Menu>
-        <MenuButton p="0px">
+        <MenuButton onClick={handleButtonClick} p="0px">
           <Icon
             mt="6px"
             as={MdNotificationsNone}
@@ -163,7 +167,7 @@ export default function HeaderLinks(props: { secondary: boolean }) {
       </Menu>
 
       <Menu>
-        <MenuButton p="0px">
+        <MenuButton onClick={handleButtonClick} p="0px">
           <Icon
             mt="6px"
             as={MdInfoOutline}
@@ -225,7 +229,7 @@ export default function HeaderLinks(props: { secondary: boolean }) {
       </Menu>
       <Configurator />
       <Menu>
-        <MenuButton p="0px" style={{ position: 'relative' }}>
+        <MenuButton onClick={handleButtonClick} p="0px" style={{ position: 'relative' }}>
           <Box
             _hover={{ cursor: 'pointer' }}
             color="white"

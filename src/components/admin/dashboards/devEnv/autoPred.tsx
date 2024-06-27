@@ -26,8 +26,16 @@
     let defaultData = tableData;
 
     const convertFrequency = (seconds: number) => {
+      console.log(seconds);
       const days = Math.floor(seconds / (24 * 3600));
-      const hours = Math.floor((seconds % (24 * 3600)) / 3600);
+      //const hours = Math.floor((seconds % (24 * 3600)) / 3600);
+      let hours;
+      if (seconds < 3600) {
+        hours = (seconds/3600).toFixed(2);
+      } else {
+        hours = Math.floor((seconds % (24 * 3600)) / 3600);
+      }
+      console.log(hours);
       return { days, hours };
     };
 

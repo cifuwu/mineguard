@@ -596,6 +596,7 @@ export default function HeaderLinks() {
                 <Text color={textColor} fontSize="xl" fontWeight="700">
                   Configurator
                 </Text>
+                {/*
                 <Text
                   display={'flex'}
                   color="secondaryGray.600"
@@ -617,6 +618,7 @@ export default function HeaderLinks() {
                     v2.0.0
                   </Badge>
                 </Text>
+                */}
               </Box>
             </Flex>
             <HSeparator my="30px" bg={bgSeparator} />
