@@ -4,6 +4,7 @@ import {
   MdHome,
   MdLock,
   MdOutlineShoppingCart,
+  MdOutlineLightbulb
 } from 'react-icons/md';
 
 // Auth Imports
@@ -45,7 +46,7 @@ const routes: IRoute[] = [
     path: '/nfts',
     icon: (
       <Icon
-        as={MdOutlineShoppingCart}
+        as={MdOutlineLightbulb}
         width="20px"
         height="20px"
         color="inherit"
