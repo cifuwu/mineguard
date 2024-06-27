@@ -6,11 +6,15 @@ import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '
 import * as React from 'react';
 import { useEffect } from 'react';
 
+const ENDPOINT = "https://32meb447dzee7itae6f6enkqsq.appsync-api.sa-east-1.amazonaws.com/graphql";
+const API_KEY = "da2-hagplywtcnhr3hnq6cb63y4i2u";
+
 type RowObj = {
   component: string;
   priority: string;
   maintenance: string;
   done: boolean;
+  maintenanceID: string;
 };
 
 const formatDate = (isoDate: string) => {
@@ -30,10 +34,48 @@ export default function MaintenanceTable({ tableData, truckName, truckDate }: { 
     setData(tableData);
   }, [tableData]);
   
-  const handleSwitchChange = (index: number) => {
+  const handleSwitchChange = async (index: number) => {
     const newData = [...data];
-    newData[index].done = !newData[index].done;
+    const newDoneStatus = !newData[index].done;
+    newData[index].done = newDoneStatus;
     setData(newData);
+
+    const maintenanceID = newData[index].maintenanceID;
+    try {
+      await updateMaintenanceStatus(maintenanceID, newDoneStatus);
+      console.log('Update successful');
+    } catch (error) {
+      console.error('Update failed:', error);
+      // Revertir cambios si hay falla
+      newData[index].done = !newDoneStatus;
+      setData(newData);
+    }
+  };
+
+  const updateMaintenanceStatus = async (maintenanceID: string, done: boolean) => {
+    const requestBody = {
+      query: `
+        mutation MyMutation {
+          updateDoneMaintenance(done: ${done}, maintenanceID: "${maintenanceID}")
+        }
+      `,
+    };
+
+    const response = await fetch(ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": API_KEY,
+      },
+    });
+
+    const result = await response.json();
+    if (result.errors) {
+      throw new Error('Failed to update maintenance status');
+    }
+
+    return result.data.updateDoneMaintenance;
   };
 
   const columns = [
@@ -88,9 +130,6 @@ export default function MaintenanceTable({ tableData, truckName, truckDate }: { 
           isChecked={info.getValue()}
           onChange={() => handleSwitchChange(info.row.index)}
         />
-        /*<Text color={textColor} fontSize="md" fontWeight="500">
-          {info.getValue() ? 'Sí' : 'No'}
-        </Text>*/
       ),
     }),
   ];

@@ -13,7 +13,6 @@ export default function HomeTimeline({ data, onTruckClick }: { data: any[], onTr
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
-
     const handleTruckClick = (truck: any, date: string) => {
         onTruckClick(truck, date);
     };

@@ -1,157 +1,169 @@
 'use client';
 
 import React from 'react';
-import { useState } from 'react'; 
+import { useState, useEffect } from 'react'; 
 import { ChakraProvider } from '@chakra-ui/react';
 import TruckCounter from 'components/admin/dashboards/devEnv/truckCounter';
 import AutoPred from 'components/admin/dashboards/devEnv/autoPred';
 import HomeTimeline from 'components/admin/dashboards/devEnv/maintenanceCalendar';
 import MaintenanceTable from 'components/admin/dashboards/devEnv/maintenanceTable';
+import Card from 'components/card/Card';
 // Chakra imports
 import { Box, Flex, Grid, useColorModeValue } from '@chakra-ui/react';
 
-const jsonData = [
-  {
-    date: "2024-06-19T00:00:00.000-04:00",
-    trucks: [
-      {
-        truckID: 0,
-        name: "Truck1",
-        components: [
-          {
-            componentID: 0,
-            name: "Amortiguador",
-            priority: "Inmediata",
-            maintenance: "Cambiar los amortiguadores",
-            done: true,
-          },
-          {
-            componentID: 1,
-            name: "Frenos",
-            priority: "Urgente",
-            maintenance: "Cambiar pastillas de freno",
-            done: false,
-          },
-          {
-            componentID: 2,
-            name: "Aceite",
-            priority: "Moderada",
-            maintenance: "Revisión y cambio de aceite",
-            done: false,
-          },
-        ]
-      },
-      {
-        truckID: 1,
-        name: "Truck2",
-        components: [
-          {
-            componentID: 3,
-            name: "Amortiguador",
-            priority: "Inmediata",
-            maintenance: "Cambiar los amortiguadores",
-            done: true,
-          },
-          {
-            componentID: 4,
-            name: "Frenos",
-            priority: "Urgente",
-            maintenance: "Cambiar pastillas de freno",
-            done: false,
-          },
-        ]
-      }
-    ]
-  },
-  {
-    date: "2024-06-20T00:00:00.000-04:00",
-    trucks: [
-      {
-        truckID: 5,
-        name: "Truck6",
-        components: [
-          {
-            componentID: 9,
-            name: "Amortiguador",
-            priority: "Inmediata",
-            maintenance: "Cambiar los amortiguadores",
-            done: true,
-          },
-        ]
-      },
-      {
-        truckID: 3,
-        name: "Truck2",
-        components: [
-          {
-            componentID: 7,
-            name: "Amortiguador",
-            priority: "Inmediata",
-            maintenance: "Cambiar los amortiguadores",
-            done: true,
-          },
-          {
-            componentID: 4,
-            name: "Frenos",
-            priority: "Urgente",
-            maintenance: "Cambiar pastillas de freno",
-            done: false,
-          },
-        ]
-      }
-    ]
-  }
-];
-
-const jsonAutoPredData = 
-  {
-    "frequency": 43200, // ts 12 h = 12*3600s = 43200s
-    //"initDate": "YYYY-MM-DDTHH:MM:SS",
-    "lastPredDate": "2024-06-19T06:00:00.000-04:00",
-    "nextPredDate": "2024-06-19T18:00:00.000-04:00",
-  }
-
-const jsonTruckInfo = 
-  {
-    operative: [
-      {
-        truckID: 0,
-        name: "Truck1"
-      },
-      {
-        TruckID: 1,
-        name: "Truck2"
-      }
-    ],
-    idle: [
-      {
-        truckID: 5,
-        name: "Truck6"
-      },
-      {
-        truckID: 3,
-        name: "Truck2"
-      }
-    ]
-  }
+// Aws
+const ENDPOINT = "https://32meb447dzee7itae6f6enkqsq.appsync-api.sa-east-1.amazonaws.com/graphql";
+const API_KEY = "da2-hagplywtcnhr3hnq6cb63y4i2u";
 
 const DevelopPage = () => {
-  const paleGray = useColorModeValue('secondaryGray.400', 'whiteAlpha.100');
 
   const [selectedTruck, setSelectedTruck] = useState<any | null>(null);
   const [tableData, setTableData] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [autoPredData, setAutoPredData] = useState<any | null>(null);
+  const [trucksInfoData, setTrucksInfoData] = useState<any | null>(null);
+  const [calendarData, setCalendarData] = useState<any | null>(null);
+
+  useEffect(() => {
+    // getTrucksInfo RequestBody
+    const requestBody = {
+        query: `
+            query MyQuery {
+              getTrucksInfo {
+                  idle {
+                  name
+                  truckID
+                  components {
+                      componentID
+                      name
+                  }
+                  }
+                  operative {
+                  name
+                  truckID
+                  components {
+                      componentID
+                      name
+                  }
+                  }
+              }
+              }
+          `,
+    };
+  
+    // Fetch getTrucksInfo
+    fetch(ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": API_KEY,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.data && data.data.getTrucksInfo) {
+          setTrucksInfoData(data.data.getTrucksInfo);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching Trucks Info:", error);
+      });
+  }, []);
+  
+  useEffect(() => {
+    // getAutoPredConfig RequestBody
+    const requestBody = {
+      query: `
+        query {
+          getAutoPredConfig {
+            frequency
+            lastPredDate
+            nextPredDate
+          }
+        }
+      `,
+    };
+
+    // Fetch autoPredConfig
+    fetch(ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": API_KEY,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.data && data.data.getAutoPredConfig) {
+          setAutoPredData(data.data.getAutoPredConfig);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching auto prediction config:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const initialDate = "2024-06-28";
+    const lastDate = "2024-07-01";
+
+    // getTrucksInfo RequestBody
+    const requestBody = {
+      query: `
+          query MyQuery {
+            getCalendar(initialDate: "${initialDate}", lastDate: "${lastDate}") {
+                date
+                trucks {
+                name
+                truckID
+                components {
+                    maintenanceID
+                    componentID
+                    done
+                    maintenance
+                    name
+                    priority
+                }
+                }
+            }
+            }
+        `,
+    };
+  
+    // Fetch getTrucksInfo
+    fetch(ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": API_KEY,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.data && data.data.getCalendar) {
+          setCalendarData(data.data.getCalendar);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching Calendar Info:", error);
+      });
+  }, []);
+  console.log(calendarData);
 
   const handleTruckClick = (truck: any, date: string) => {
     setSelectedTruck(truck);
     setSelectedDate(date);
-    const selectedTruckData = jsonData.find(entry => entry.date === date)?.trucks.find(t => t.truckID === truck.truckID);
+    const selectedTruckData = calendarData.find(entry => entry.date === date)?.trucks.find(t => t.truckID === truck.truckID);
     if (selectedTruckData) {
       setTableData(selectedTruckData.components.map((component: any) => ({
         component: component.name,
         priority: component.priority,
         maintenance: component.maintenance,
-        done: component.done ? 'Sí' : 'No',
+        done: component.done,
+        maintenanceID: component.maintenanceID,
       })));
     } else {
       setTableData([]);
@@ -172,13 +184,25 @@ const DevelopPage = () => {
           }}
         >
           <Flex gridArea={{ md: '1 / 1 / 1 / 2', '2xl': '1 / 1 / 1 / 2' }}>
-            <TruckCounter title="Máquinas operando" number={jsonTruckInfo.operative.length}/>
+            {trucksInfoData ? (
+              <TruckCounter title="Máquinas operando" number={trucksInfoData.operative.length}/>
+            ) : (
+              <Card>Cargando...</Card>
+            )}
           </Flex>
           <Flex gridArea={{ md: '1 / 2 / 1 / 3', '2xl': '1 / 2 / 1 / 3' }}>
-            <TruckCounter title="Máquinas en espera de mantención" number={jsonTruckInfo.idle.length}/>
+            {trucksInfoData ? (
+              <TruckCounter title="Máquinas en espera de mantención" number={trucksInfoData.idle.length}/>
+            ) : (
+              <Card>Cargando...</Card>
+            )}
           </Flex>
           <Flex gridArea={{ md: '1 / 3 / 1 / 5', '2xl': '1 / 3 / 1 / 5' }}>
-            <AutoPred tableData={jsonAutoPredData}/>
+          {autoPredData ? (
+              <AutoPred tableData={autoPredData}/>
+            ) : (
+              <Card>Cargando configuración de predicción...</Card>
+            )}
           </Flex>
         </Grid>
         <Grid
@@ -187,7 +211,11 @@ const DevelopPage = () => {
           display={{ base: 'block', lg: 'grid' }}
         >
           <Box gridArea="2 / 1 / 2 / 4">
-            <HomeTimeline data={jsonData} onTruckClick={handleTruckClick}/>
+            {calendarData ? (
+              <HomeTimeline data={calendarData} onTruckClick={handleTruckClick}/>
+            ) : (
+              <Card>Cargando...</Card>
+            )}
           </Box>
         </Grid>
         <Grid
