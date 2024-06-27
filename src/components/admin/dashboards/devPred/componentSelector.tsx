@@ -6,6 +6,7 @@ import {
   Box,
   useColorModeValue,
 } from '@chakra-ui/react';
+import Card from 'components/card/Card';
 
 const ComponentSelector = ({ components, onSelectComponent }) => {
   const handleComponentSelect = (componentId) => {
@@ -17,7 +18,7 @@ const ComponentSelector = ({ components, onSelectComponent }) => {
       align="flex-start"
       spacing="3"
       w="100%"
-      maxH="300px"
+      maxH="600px"
       overflowY="auto"
     >
       <Text fontSize="md" fontWeight="bold" mb="4">
@@ -26,7 +27,7 @@ const ComponentSelector = ({ components, onSelectComponent }) => {
       <Box w="100%">
         {components.map((component) => (
           <Box
-            key={component.id}
+            key={component.componentID}
             w="100%"
             p="3"
             display="flex"
@@ -38,7 +39,7 @@ const ComponentSelector = ({ components, onSelectComponent }) => {
             <Checkbox
               colorScheme="brand"
               isChecked={component.isSelected}
-              onChange={() => handleComponentSelect(component.id)}
+              onChange={() => handleComponentSelect(component.componentID)}
               mr="4"
             />
           </Box>
@@ -52,21 +53,12 @@ const ComponentSelectorContainer = ({ components, onSelectComponent }) => {
   const containerBgColor = useColorModeValue('gray.50', 'gray.800');
 
   return (
-    <Box
-      bg={containerBgColor}
-      borderRadius="xl"
-      p={4}
-      boxShadow="md"
-      w="100%"
-      maxW="sm"
-      mx="auto"
-      my={4}
-    >
+    <Card alignItems="center" flexDirection="column" w="100%">
       <ComponentSelector
         components={components}
         onSelectComponent={onSelectComponent}
       />
-    </Box>
+    </Card>
   );
 };
 

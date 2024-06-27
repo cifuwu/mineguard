@@ -1,11 +1,12 @@
 import React from 'react';
 import { VStack, Box, Text, useColorModeValue } from '@chakra-ui/react';
+import Card from 'components/card/Card';
 
 const TruckSelector = ({ trucks, selectedTruck, onSelectTruck }) => {
   const bgColor = useColorModeValue('gray.100', 'gray.700');
   const selectedBgColor = useColorModeValue('brand.100', 'brand.600');
   const textColor = useColorModeValue('gray.800', 'white');
-
+  
   const handleTruckSelect = (truckId) => {
     onSelectTruck(truckId);
   };
@@ -15,7 +16,8 @@ const TruckSelector = ({ trucks, selectedTruck, onSelectTruck }) => {
       align="flex-start"
       spacing="3"
       w="100%"
-      maxH="300px"
+      pr={3}
+      maxH="600px"
       overflowY="auto"
     >
       <Text fontSize="md" fontWeight="bold" mb="4">
@@ -24,12 +26,12 @@ const TruckSelector = ({ trucks, selectedTruck, onSelectTruck }) => {
 
       {trucks.map((truck) => (
         <Box
-          key={truck.id}
+          key={truck.truckID}
           w="100%"
           p="3"
           cursor="pointer"
-          onClick={() => handleTruckSelect(truck.id)}
-          bg={selectedTruck === truck.id ? selectedBgColor : bgColor}
+          onClick={() => handleTruckSelect(truck.truckID)}
+          bg={selectedTruck === truck.truckID ? selectedBgColor : bgColor}
           boxShadow="sm"
           borderRadius="xl"
           borderWidth="1px"
@@ -52,22 +54,13 @@ const TruckSelectorContainer = ({ trucks, selectedTruck, onSelectTruck }) => {
   const containerBgColor = useColorModeValue('gray.50', 'gray.800');
 
   return (
-    <Box
-      bg={containerBgColor}
-      borderRadius="xl"
-      p={4}
-      boxShadow="md"
-      w="100%"
-      maxW="sm"
-      mx="auto"
-      my={4}
-    >
+    <Card alignItems="center" flexDirection="column" w="100%">
       <TruckSelector
         trucks={trucks}
         selectedTruck={selectedTruck}
         onSelectTruck={onSelectTruck}
       />
-    </Box>
+    </Card>
   );
 };
 

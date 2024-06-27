@@ -1,56 +1,73 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Flex, Text } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Flex, Text, Grid } from '@chakra-ui/react';
 import TruckSelector from '../../../../components/admin/dashboards/devPred/truckSelector';
 import ComponentSelector from '../../../../components/admin/dashboards/devPred/componentSelector';
 import PredictionGenerator from '../../../../components/admin/dashboards/devPred/predictionGenerator';
+import Card from 'components/card/Card';
 
-// Ejemplo de datos simulados
-const trucks = [
-  { id: 1, name: 'Camión 1' },
-  { id: 2, name: 'Camión 2' },
-  { id: 3, name: 'Camión 3' },
-  { id: 4, name: 'Camión 4' },
-  { id: 5, name: 'Camión 5' },
-  { id: 6, name: 'Camión 6' },
-  { id: 7, name: 'Camión 7' },
-  { id: 8, name: 'Camión 8' },
-  { id: 9, name: 'Camión 9' },
-  { id: 10, name: 'Camión 10' },
-];
-
-const componentsByTruck = {
-  1: [
-    { id: 1, name: 'Componente A', date: '2024-06-25', time: '08:00' },
-    { id: 2, name: 'Componente B', date: '2024-06-26', time: '10:00' },
-  ],
-  2: [
-    { id: 3, name: 'Componente C', date: '2024-06-27', time: '12:00' },
-    { id: 4, name: 'Componente D', date: '2024-06-28', time: '14:00' },
-  ],
-  3: [
-    { id: 5, name: 'Componente E', date: '2024-06-29', time: '16:00' },
-    { id: 6, name: 'Componente F', date: '2024-06-30', time: '18:00' },
-  ],
-};
+const ENDPOINT = "https://32meb447dzee7itae6f6enkqsq.appsync-api.sa-east-1.amazonaws.com/graphql";
+const API_KEY = "da2-hagplywtcnhr3hnq6cb63y4i2u";
 
 const ManualPredictionPage = () => {
-  const [selectedTruck, setSelectedTruck] = useState('');
+  const [selectedTruck, setSelectedTruck] = useState(null);
   const [selectedComponents, setSelectedComponents] = useState([]);
+  const [trucksAndComponentsData, setTrucksAndComponentsData] = useState<any | null>(null);
 
-  const handleTruckSelect = (truckId) => {
-    setSelectedTruck(truckId);
+  useEffect(() => {
+    // getTrucksAndComponents RequestBody
+    const requestBody = {
+      query: `
+          query MyQuery {
+            getTrucksAndComponents {
+                name
+                truckID
+                components {
+                    componentID
+                    name
+                }
+            }
+        }
+        `,
+    };
+  
+    // Fetch getTrucksAndComponents
+    fetch(ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": API_KEY,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.data && data.data.getTrucksAndComponents) {
+          console.log(data.data.getTrucksAndComponents);
+          setTrucksAndComponentsData(data.data.getTrucksAndComponents);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching Trucks and Components Info:", error);
+      });
+  }, []);
+
+  const handleTruckSelect = (truckID) => {
+    const truck = trucksAndComponentsData.find(truck => truck.truckID === truckID);
+    setSelectedTruck(truck);
     setSelectedComponents([]);
+    console.log(truck);
   };
 
-  const handleComponentSelect = (componentId) => {
-    if (selectedComponents.includes(componentId)) {
+  const handleComponentSelect = (componentID) => {
+    console.log(componentID);
+    if (selectedComponents.includes(componentID)) {
       setSelectedComponents(
-        selectedComponents.filter((id) => id !== componentId),
+        selectedComponents.filter((id) => id !== componentID),
       );
     } else {
-      setSelectedComponents([...selectedComponents, componentId]);
+      setSelectedComponents([...selectedComponents, componentID]);
     }
   };
 
@@ -60,27 +77,40 @@ const ManualPredictionPage = () => {
     // Aquí iría la lógica para generar la predicción
   };
 
-  const components = selectedTruck ? componentsByTruck[selectedTruck] : [];
-
   return (
-    <Flex direction="column" justify="center" h="100vh">
-      <Text fontSize="3xl" fontWeight="bold" mb="8">
-        Predicción Manual
-      </Text>
-      <Flex justify="space-between" w="80%">
-        <TruckSelector trucks={trucks} onSelectTruck={handleTruckSelect} />
-        {selectedTruck && (
-          <ComponentSelector
-            components={components}
-            onSelectComponent={handleComponentSelect}
-          />
-        )}
-        {selectedComponents.length > 0 && (
-          <PredictionGenerator
-            selectedComponents={selectedComponents}
-            onGeneratePrediction={handleGeneratePrediction}
-          />
-        )}
+    <Flex direction={{ base: 'column', xl: 'row' }} pt={{ base: '130px', md: '80px', xl: '80px' }} >
+      <Flex direction="column" width="stretch">
+        <Grid
+          gap="40px"
+          gridTemplateColumns={{
+            md: 'repeat(7, 1fr)',
+            '2xl': 'repeat(7, 1fr)',
+          }}
+        >
+          <Flex gridArea={{ md: '1 / 2 / 1 / 4', '2xl': '1 / 2 / 1 / 4' }}>
+            {trucksAndComponentsData ? (
+              <TruckSelector trucks={trucksAndComponentsData} selectedTruck={selectedTruck} onSelectTruck={handleTruckSelect} />
+            ) : (
+              <Card>Cargando...</Card>
+            )}
+          </Flex>
+            {selectedTruck && (
+              <Flex gridArea={{ md: '1 / 4 / 1 / 6', '2xl': '1 / 4 / 1 / 6' }}>
+                <ComponentSelector
+                  components={selectedTruck.components}
+                  onSelectComponent={handleComponentSelect}
+                />
+              </Flex>
+            )}
+          <Flex gridArea={{ md: '1 / 6 / 1 / 6', '2xl': '1 / 6 / 1 / 6' }}>
+            {selectedComponents.length > 0 && (
+              <PredictionGenerator
+                selectedComponents={selectedComponents}
+                onGeneratePrediction={handleGeneratePrediction}
+              />
+            )}
+          </Flex>
+        </Grid>
       </Flex>
     </Flex>
   );
