@@ -55,7 +55,7 @@ function SidebarContent(props: {
       >
         {/*<SidebarCard mini={mini} hovered={hovered} />*/}
       </Flex>
-      <Flex mt="75px" mb="56px" justifyContent="center" alignItems="center">
+      {/*<Flex mt="75px" mb="56px" justifyContent="center" alignItems="center">
         <Avatar
           h="48px"
           w="48px"
@@ -84,7 +84,7 @@ function SidebarContent(props: {
             Product Designer
           </Text>
         </Box>
-      </Flex>
+      </Flex>*/}
     </Flex>
   );
 }

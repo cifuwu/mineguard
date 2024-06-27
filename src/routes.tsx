@@ -12,7 +12,7 @@ import { IRoute } from 'types/navigation';
 const routes: IRoute[] = [
   // --- Dashboards ---
   {
-    name: 'Dashboards',
+    name: 'Home',
     path: '/dashboards',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     collapse: true,
@@ -41,7 +41,7 @@ const routes: IRoute[] = [
   },
   // // --- NFTs ---
   {
-    name: 'NFTs',
+    name: 'Predicción Manual',
     path: '/nfts',
     icon: (
       <Icon
@@ -79,6 +79,7 @@ const routes: IRoute[] = [
       },
     ],
   },
+  /*
   // // --- Main pages ---
   {
     name: 'Main Pages',
@@ -250,6 +251,8 @@ const routes: IRoute[] = [
       },
     ],
   },
+  */
+  /*
   // --- Authentication ---
   {
     name: 'Authentication',
@@ -349,6 +352,7 @@ const routes: IRoute[] = [
       },
     ],
   },
-];
+  */
+];  
 
 export default routes;

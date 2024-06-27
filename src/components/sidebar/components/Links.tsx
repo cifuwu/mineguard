@@ -44,6 +44,19 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
     [pathname],
   );
 
+  const handleAccordionClick = (event, route) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Aquí puedes ejecutar la función personalizada que deseas al hacer clic
+    if (route.name === 'Home') {
+      window.location.href = '/home';
+    }
+    if (route.name === 'Predicción Manual') {
+      window.location.href = '/manualprediction';
+    }
+  };
+
   // this function creates the links and collapses that appear in the sidebar (left menu)
   const createLinks = (routes: IRoute[]) => {
     return routes.map((route, key) => {
@@ -71,6 +84,7 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
                 py="0px"
                 bg={'transparent'}
                 ms={0}
+                onClick={(event) => handleAccordionClick(event, route)}
               >
                 {route.icon ? (
                   <Flex
@@ -128,11 +142,13 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
                           }
                           fontWeight="500"
                           fontSize="md"
+                          whiteSpace="nowrap"
                         >
                           {route.name}
                         </Text>
                       </Flex>
                     </HStack>
+                    {/*
                     <AccordionIcon
                       display={
                         mini === false
@@ -145,6 +161,7 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
                       color={'secondaryGray.600'}
                       transform={route.icon ? null : 'translateX(-70%)'}
                     />
+                    */}
                   </Flex>
                 ) : (
                   <Flex
