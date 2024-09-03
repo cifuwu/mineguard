@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 // Chakra imports
 import {
   Box,
@@ -19,7 +20,6 @@ import {
   Text,
 } from '@chakra-ui/react';
 // Assets
-import { FcGoogle } from 'react-icons/fc';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { RiEyeCloseLine } from 'react-icons/ri';
 
@@ -38,7 +38,7 @@ function SignIn() {
   const textColorDetails = useColorModeValue('navy.700', 'secondaryGray.600');
   const textColorBrand = useColorModeValue('brand.500', 'white');
   const brandStars = useColorModeValue('brand.500', 'brand.400');
-  
+
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
 
@@ -47,7 +47,7 @@ function SignIn() {
   const [wrongCredentials, setWrongCredentials] = useState(false);
 
   const handleSubmit = () => {
-
+    
     const requestBody = {
       query: `
         query Login($data: LoginData) {
@@ -80,7 +80,11 @@ function SignIn() {
           setWrongCredentials(true);
         }
         if (data && data.data && data.data.login) {
-          console.log(data.data.login);
+          console.log(data.data.login.accessToken);
+
+          const accessToken = data.data.login.accessToken;
+          Cookies.set('accessJWT', accessToken, { expires: 1 });
+          window.location.href = "/home";
         }
       })
       .catch((error) => {
