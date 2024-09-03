@@ -45,7 +45,9 @@ export default function CenteredAuthLayout(props: CenteredAuthLayoutProps) {
         bgGradient="linear(to-b, brand.400, brand.600)"
         mx={{ md: 'auto' }}
       />
+      {/*
       <Navbar />
+      */}
       <Card
         w={{ base: '100%', md: 'max-content' }}
         h="max-content"

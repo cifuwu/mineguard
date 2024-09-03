@@ -25,7 +25,7 @@ export default function Footer() {
               base: 'center',
               xl: 'start',
           }}
-          justifyContent="space-between"
+          justifyContent="center"
           px={{ base: '0px', xl: '0px' }}
           pb="30px"
           mx="auto"
@@ -39,9 +39,10 @@ export default function Footer() {
               mb={{ base: '20px', xl: '0px' }}
           >
               {' '}
-              &copy; {1900 + new Date().getFullYear()}
+              &copy; {new Date().getFullYear()}
               <Text as="span" fontWeight="500" ms="4px">
-                  Horizon UI. All Rights Reserved. Made with love by
+                  Mineguard.
+                  {/*
                   <Link
                       mx="3px"
                       color={textColor}
@@ -50,8 +51,10 @@ export default function Footer() {
                   >
                       Simmmple!
                   </Link>
+                  */}
               </Text>
           </Text>
+          {/*
           <List display="flex">
               <ListItem
                   me={{
@@ -105,6 +108,7 @@ export default function Footer() {
                   </Link>
               </ListItem>
           </List>
+          */}
       </Flex>
   );
 }
