@@ -20,11 +20,18 @@ interface VariableChartProps {
     type: 'max' | 'min';
     value: number;
   };
+  date: string
 }
 
-const VariableChart: React.FC<VariableChartProps> = ({ label, data, unit, threshold }) => {
+const VariableChart: React.FC<VariableChartProps> = ({ label, data, unit, threshold, date}) => {
+  
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('es-Cl', { hour: '2-digit', minute: '2-digit' });
+  };
+  
   const chartData = {
-    labels: data.map((_, index) => `Point ${index + 1}`),
+    labels: data.map((_, index) => formatDate(date)),
     datasets: [
       {
         label: `${label} (${unit})`,
@@ -40,10 +47,10 @@ const VariableChart: React.FC<VariableChartProps> = ({ label, data, unit, thresh
               label: `Umbral ${threshold.type} (${unit})`,
               data: new Array(data.length).fill(threshold.value), // Línea horizontal en todo el gráfico
               borderColor: 'red', 
-              borderWidth: 2, 
-              pointRadius: 0, 
+              borderWidth: 1, 
+              pointRadius: 1, 
               fill: false, 
-              tension: 0, 
+              tension: 1, 
             },
           ]
         : []),
@@ -64,11 +71,7 @@ const VariableChart: React.FC<VariableChartProps> = ({ label, data, unit, thresh
         },
       },
     },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
+
   };
 
   return (
