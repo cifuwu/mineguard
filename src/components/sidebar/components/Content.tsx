@@ -6,6 +6,8 @@ import {
   Stack,
   Text,
   useColorModeValue,
+  Button,
+  Icon
 } from '@chakra-ui/react';
 //   Custom components
 import Brand from 'components/sidebar/components/Brand';
@@ -13,6 +15,8 @@ import Links from 'components/sidebar/components/Links';
 import SidebarCard from 'components/sidebar/components/SidebarCard';
 import avatar4 from '/public/img/avatars/avatar4.png';
 import { IRoute } from 'types/navigation';
+import { FiLogOut } from 'react-icons/fi';
+import Cookie from 'js-cookie'
 
 // FUNCTIONS
 
@@ -23,6 +27,12 @@ function SidebarContent(props: {
 }) {
   const { routes, mini, hovered } = props;
   const textColor = useColorModeValue('navy.700', 'white');
+
+  const handleClick = () => {
+    Cookie.remove('accessJWT');
+    window.location.href = '/login';
+  }
+
   // SIDEBAR
   return (
     <Flex direction="column" height="100%" pt="25px" borderRadius="30px">
@@ -55,7 +65,8 @@ function SidebarContent(props: {
       >
         {/*<SidebarCard mini={mini} hovered={hovered} />*/}
       </Flex>
-      {/*<Flex mt="75px" mb="56px" justifyContent="center" alignItems="center">
+      <Flex mt="75px" mb="56px" justifyContent="center" alignItems="center">
+        {/*
         <Avatar
           h="48px"
           w="48px"
@@ -84,7 +95,24 @@ function SidebarContent(props: {
             Product Designer
           </Text>
         </Box>
-      </Flex>*/}
+        */}
+        <Button
+          borderRadius="16px"
+          minW="70%"
+          h="44px"
+          variant="brand"
+          color="white"
+          fontSize="sm"
+          fontWeight="500"
+          _hover={{ bg: 'brand.600' }}
+          _active={{ bg: 'brand.500' }}
+          _focus={{ bg: 'brand.500' }}
+          onClick={handleClick}
+        >
+          <Icon w="22px" h="22px" me="4px" as={FiLogOut} color="white" />
+          Cerrar sesión
+        </Button>
+      </Flex>
     </Flex>
   );
 }
