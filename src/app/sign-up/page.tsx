@@ -19,6 +19,8 @@ import {
   SimpleGrid,
   Text,
   useColorModeValue,
+  Select,
+  useToast
 } from '@chakra-ui/react';
 import Link from 'components/link/Link';
 
@@ -41,15 +43,52 @@ function SignUp() {
   const textColorDetails = useColorModeValue('navy.700', 'secondaryGray.600');
   const textColorBrand = useColorModeValue('brand.500', 'white');
   const brandStars = useColorModeValue('brand.500', 'brand.400');
-
+  
+  const toast = useToast();
+  
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
 
-  const [email, setEmail] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [emailExists, setEmailExists] = useState(false);
-  
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
+
+  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const isValidPassword = (value: string) => {
+    const minLength = value.length >= 8;
+    const hasNumber = /\d/.test(value);
+    const hasUppercase = /[A-Z]/.test(value);
+
+    if (!minLength || !hasNumber || !hasUppercase) {
+      setErrorMsg('Contraseña inválida.');
+    } else {
+      setErrorMsg('');
+      return true;
+    }
+
+    return false;
+  };
+
   const handleSubmit = () => {
+    
+    if (!firstname || !lastname || !username || !password || !question || !answer) {
+      setErrorMsg("Todos los campos deben estar llenos");
+      setError(true);
+      return;
+    }
+
+    const fullname = firstname + ' ' + lastname;
+
+    if (!isValidPassword(password)) {
+      setErrorMsg('Contraseña inválida')
+      setError(true);
+      return;
+    }
 
     const requestBody = {
       query: `
@@ -59,13 +98,17 @@ function SignUp() {
       `,
       variables: {
         data: {
-          email: email,
+          name: fullname,
+          username: username,
           password: password,
+          userType: "user",
+          question: question,
+          answer: answer
         },
       },
     };
   
-    // Fetch getManualPrediction
+    // Fetch Register
     fetch(ENDPOINT, {
       method: "POST",
       body: JSON.stringify(requestBody),
@@ -77,10 +120,24 @@ function SignUp() {
       .then((data) => {
         if (data.errors) {
           console.error("Error:", data.errors[0].message);
-          setEmailExists(true);
+          if (data.errors[0].message.charAt(0) === '1') {
+            setErrorMsg('Nombre de usuario ocupado');
+            setError(true);
+            return;
+          } else {setError(false)}
         }
         if (data && data.data && data.data.register) {
           console.log(data.data.register);
+          toast({
+            title: 'Cuenta creada.',
+            description: "Has creado tu cuenta con éxito!",
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+          })
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
         }
       })
       .catch((error) => {
@@ -110,15 +167,24 @@ function SignUp() {
             Crear cuenta
           </Heading>
           <Text
-            mb="36px"
+            mb="24px"
             ms="4px"
             color={textColorSecondary}
             fontWeight="400"
             fontSize="md"
           >
-            Ingresa tu email y contraseña para crear una cuenta!
+            Ingresa tu usuario y contraseña para crear una cuenta!
           </Text>
         </Box>
+        <Text
+          color={alertColor}
+          fontWeight="400"
+          fontSize="md"
+          ms="4px"
+          display={error ? "flex" : "none"}
+        >
+          {errorMsg}
+        </Text>
         <Flex
           zIndex="2"
           direction="column"
@@ -154,6 +220,8 @@ function SignUp() {
                   variant="auth"
                   mb="24px"
                   size="lg"
+                  value={firstname}
+                  onChange={(e) => {setFirstname(e.target.value)}}
                 />
               </Flex>
               <Flex direction="column">
@@ -174,68 +242,132 @@ function SignUp() {
                   placeholder="Last name"
                   mb="24px"
                   size="lg"
+                  value={lastname}
+                  onChange={(e) => {setLastname(e.target.value)}}
                 />
               </Flex>
             </SimpleGrid>
-            <Text
-            color={alertColor}
-            fontWeight="400"
-            fontSize="sm"
-            ms="4px"
-            display={emailExists ? "block" : "none"}
-            >Este email ya está utilizado!</Text>
-            <FormLabel
-              display="flex"
-              ms="4px"
-              fontSize="sm"
-              fontWeight="500"
-              color={textColor}
-              mb="8px"
+            <SimpleGrid
+              columns={{ base: 1, md: 2 }}
+              gap={{ sm: '10px', md: '26px' }}
             >
-              Email<Text color={brandStars}>*</Text>
-            </FormLabel>
-            <Input
-              isRequired={true}
-              variant="auth"
-              fontSize="sm"
-              type="email"
-              placeholder="mail@simmmple.com"
-              mb="24px"
-              size="lg"
-              value={email}
-              onChange={(e) => {setEmail(e.target.value)}}
-            />
-            <FormLabel
-              ms="4px"
-              fontSize="sm"
-              fontWeight="500"
-              color={textColor}
-              display="flex"
-            >
-              Contraseña<Text color={brandStars}>*</Text>
-            </FormLabel>
-            <InputGroup size="md">
-              <Input
-                isRequired={true}
-                variant="auth"
-                fontSize="sm"
-                ms={{ base: '0px', md: '4px' }}
-                placeholder="Min. 8 characters"
-                mb="24px"
-                size="lg"
-                type={show ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => {setPassword(e.target.value)}}
-              />
-              <InputRightElement display="flex" alignItems="center" mt="4px">
-                <Icon
-                  color={textColorSecondary}
-                  _hover={{ cursor: 'pointer' }}
-                  as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
-                  onClick={handleClick}
+              <Flex direction="column">
+                
+                <FormLabel
+                  display="flex"
+                  ms="4px"
+                  fontSize="sm"
+                  fontWeight="500"
+                  color={textColor}
+                  mb="8px"
+                >
+                  Nombre de usuario<Text color={brandStars}>*</Text>
+                </FormLabel>
+                <Input
+                  isRequired={true}
+                  variant="auth"
+                  fontSize="sm"
+                  type="text"
+                  placeholder="Pablo.contreras98"
+                  size="lg"
+                  value={username}
+                  onChange={(e) => {setUsername(e.target.value)}}
                 />
-              </InputRightElement>
-            </InputGroup>
+              </Flex>
+              <Flex direction="column">
+                <FormLabel
+                  ms="4px"
+                  fontSize="sm"
+                  fontWeight="500"
+                  color={textColor}
+                  display="flex"
+                >
+                  Contraseña<Text color={brandStars}>*</Text>
+                </FormLabel>
+                <InputGroup size="md">
+                  <Input
+                    isRequired={true}
+                    variant="auth"
+                    fontSize="sm"
+                    ms={{ base: '0px', md: '4px' }}
+                    placeholder="Min. 8 characters"
+                    //mb="24px"
+                    size="lg"
+                    type={show ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => {setPassword(e.target.value)}}
+                  />
+                  <InputRightElement display="flex" alignItems="center" mt="4px">
+                    <Icon
+                      color={textColorSecondary}
+                      _hover={{ cursor: 'pointer' }}
+                      as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
+                      onClick={handleClick}
+                    />
+                  </InputRightElement>
+                </InputGroup>
+              </Flex>
+            </SimpleGrid>
+            <Text
+              mb="24px"
+              ms="4px"
+              color={textColorSecondary}
+              fontWeight="400"
+              fontSize="sm"
+            >
+              La contraseña requiere 8 caracteres, una mayúscula y un número.
+            </Text>
+            <SimpleGrid
+              columns={{ base: 1, md: 2 }}
+              gap={{ sm: '10px', md: '26px' }}
+            >
+              <Flex direction="column">
+                <FormLabel
+                  display="flex"
+                  ms="4px"
+                  fontSize="sm"
+                  fontWeight="500"
+                  color={textColor}
+                  mb="8px"
+                >
+                  Pregunta secreta<Text color={brandStars}>*</Text>
+                </FormLabel>
+                <Select value={question} onChange={(e) => {setQuestion(e.target.value)}} 
+                  size="lg" 
+                  fontSize="sm" 
+                  fontWeight="500" 
+                  variant="auth" 
+                  mb="24px" 
+                >
+                  <option value=''>Seleccionar</option>
+                  <option value='1'>¿En qué ciudad naciste?</option>
+                  <option value='2'>¿Cuál fue el nombre de tu primera mascota?</option>
+                  <option value='3'>¿Cuál fue el nombre de tu primer amor?</option>
+                </Select>
+              </Flex>
+              <Flex direction="column">
+              <FormLabel
+                display="flex"
+                ms="4px"
+                fontSize="sm"
+                fontWeight="500"
+                color={textColor}
+                mb="8px"
+              >
+                Respuesta<Text color={brandStars}>*</Text>
+              </FormLabel>
+                <Input
+                  isRequired={true}
+                  variant="auth"
+                  fontSize="sm"
+                  type="text"
+                  placeholder="Respuesta"
+                  size="lg"
+                  value={answer}
+                  onChange={(e) => {setAnswer(e.target.value)}}
+                />
+              </Flex>
+            </SimpleGrid>
             <Button
               variant="brand"
               fontSize="14px"

@@ -42,9 +42,11 @@ function SignIn() {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
 
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [wrongCredentials, setWrongCredentials] = useState(false);
+
+  
 
   const handleSubmit = () => {
     
@@ -59,7 +61,7 @@ function SignIn() {
       `,
       variables: {
         data: {
-          email: email,
+          username: username,
           password: password,
         },
       },
@@ -117,7 +119,7 @@ function SignIn() {
             fontWeight="400"
             fontSize="md"
           >
-            Ingresa tu email y contraseña para iniciar sesión!
+            Ingresa tu usuario y contraseña para iniciar sesión!
           </Text>
         </Box>
         <Flex
@@ -148,20 +150,20 @@ function SignIn() {
               color={textColor}
               mb="8px"
             >
-              Email<Text color={brandStars}>*</Text>
+              Nombre de usuario<Text color={brandStars}>*</Text>
             </FormLabel>
             <Input
               isRequired={true}
               variant="auth"
               fontSize="sm"
               ms={{ base: '0px', md: '0px' }}
-              type="email"
-              placeholder="mail@simmmple.com"
+              type="text"
+              placeholder="Pablo.contreras98"
               mb="24px"
               fontWeight="500"
               size="lg"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <FormLabel
               ms="4px"
@@ -211,7 +213,7 @@ function SignIn() {
                   Mantenme conectado
                 </FormLabel>
               </FormControl>
-              <NavLink href="/auth/forgot-password">
+              <NavLink href="/forgotPassword">
                 <Text
                   color={textColorBrand}
                   fontSize="sm"

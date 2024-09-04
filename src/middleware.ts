@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 
 export async function middleware(req) {
     const token = req.cookies.get('accessJWT')?.value;
-    const publicPaths = ['/login', '/sign-up'];
+    const publicPaths = ['/login', '/sign-up', '/forgotPassword'];
     
     // Si el usuario tiene un token y quiere entrar a un path publico
     if (token && publicPaths.includes(req.nextUrl.pathname)) {
