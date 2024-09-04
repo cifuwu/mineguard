@@ -312,7 +312,7 @@ const TruckMonitoringPage = () => {
 
 
   const handleArrowClick = (serie) => {
-    window.location.href = `/admin/dashboards/devMonChart?serie=${encodeURIComponent(serie)}`;
+    window.location.href = `/devMonChart?serie=${encodeURIComponent(serie)}`;
   };
 
   return (

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'react-router-dom';import TruckGraphsGrid from '../../../../components/admin/dashboards/devMonGraph/truckGraphs';
+import { useParams } from 'react-router-dom';
+import TruckGraphsGrid from 'components/admin/dashboards/devMonGraph/truckGraphs';
 
 const mockData = [
   {
