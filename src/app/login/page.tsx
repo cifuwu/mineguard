@@ -67,7 +67,7 @@ function SignIn() {
       },
     };
   
-    // Fetch getManualPrediction
+    // Fetch Login
     fetch(ENDPOINT, {
       method: "POST",
       body: JSON.stringify(requestBody),

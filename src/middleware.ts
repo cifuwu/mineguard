@@ -3,6 +3,11 @@ import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose';
 
 export async function middleware(req) {
+
+    if (process.env.NODE_ENV === 'development') {
+        return NextResponse.next();
+    }
+
     const token = req.cookies.get('accessJWT')?.value;
     const publicPaths = ['/login', '/sign-up', '/forgotPassword'];
     
