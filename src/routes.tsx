@@ -1,20 +1,33 @@
 import { Icon } from '@chakra-ui/react';
 import {
-  MdDashboard,
   MdHome,
-  MdLock,
-  MdOutlineShoppingCart,
-  MdOutlineLightbulb
+  MdInsertChartOutlined,
+  MdOutlineLightbulb,
+  MdOutlineNotificationImportant
 } from 'react-icons/md';
 
 // Auth Imports
 import { IRoute } from 'types/navigation';
 
+import Cookies from 'js-cookie';
+import { decodeJwt } from 'jose';
+
+const token = Cookies.get('accessJWT');
+let userType: string | null = null;
+
+if ( token ) {
+  try {
+    const decodedToken = decodeJwt(token);
+    userType = decodedToken.userType as string;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+  }
+}
+
 const routes: IRoute[] = [
-  // --- Dashboards ---
   {
     name: 'Home',
-    path: '/dashboards',
+    path: '/home',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     collapse: true,
     items: [
@@ -40,10 +53,9 @@ const routes: IRoute[] = [
       },
     ],
   },
-  // // --- NFTs ---
   {
     name: 'Predicción Manual',
-    path: '/nfts',
+    path: '/manualprediction',
     icon: (
       <Icon
         as={MdOutlineLightbulb}
@@ -80,6 +92,39 @@ const routes: IRoute[] = [
       },
     ],
   },
+  {
+    name: 'Monitorización',
+    path: '/monitorization',
+    icon: (
+      <Icon
+        as={MdInsertChartOutlined}
+        width="20px"
+        height="20px"
+        color="inherit"
+      />
+    ),
+    collapse: true,
+    items: [
+    ],
+  },
+  ...(userType === 'admin' 
+    ? [
+    {
+      name: 'Alertas',
+      path: '/alerts',
+      icon: (
+        <Icon
+          as={MdOutlineNotificationImportant}
+          width="20px"
+          height="20px"
+          color="inherit"
+        />
+      ),
+      collapse: true,
+      items: [
+      ],
+    },
+  ] : []),
   /*
   // // --- Main pages ---
   {

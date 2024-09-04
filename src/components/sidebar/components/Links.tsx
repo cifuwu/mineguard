@@ -55,6 +55,12 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
     if (route.name === 'Predicción Manual') {
       window.location.href = '/manualprediction';
     }
+    if (route.name === 'Monitorización') {
+      window.location.href = '/devMon';
+    }
+    if (route.name === 'Alertas') {
+      window.location.href = '/alerts';
+    }
   };
 
   // this function creates the links and collapses that appear in the sidebar (left menu)
@@ -109,7 +115,7 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
                         alignItems="center"
                         justifyContent="center"
                       >
-                        <Box
+                        <Box // Iconos
                           color={
                             activeRoute(route.path.toLowerCase())
                               ? activeIcon
@@ -126,7 +132,7 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
                         >
                           {route.icon}
                         </Box>
-                        <Text
+                        <Text // Nombre de ruta
                           display={
                             mini === false
                               ? 'block'
