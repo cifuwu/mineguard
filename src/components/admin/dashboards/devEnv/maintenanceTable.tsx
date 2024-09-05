@@ -6,8 +6,7 @@ import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '
 import * as React from 'react';
 import { useEffect } from 'react';
 
-const ENDPOINT = "https://32meb447dzee7itae6f6enkqsq.appsync-api.sa-east-1.amazonaws.com/graphql";
-const API_KEY = "da2-hagplywtcnhr3hnq6cb63y4i2u";
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
 
 type RowObj = {
   component: string;
@@ -55,10 +54,14 @@ export default function MaintenanceTable({ tableData, truckName, truckDate }: { 
   const updateMaintenanceStatus = async (maintenanceID: string, done: boolean) => {
     const requestBody = {
       query: `
-        mutation MyMutation {
-          updateDoneMaintenance(done: ${done}, maintenanceID: "${maintenanceID}")
+        mutation UpdateDoneMaintenance($done: Boolean, $maintenanceId: String) {
+          updateDoneMaintenance(done: $done, maintenanceID: $maintenanceId)
         }
       `,
+      variables: {
+        "done": done,
+        "maintenanceId": maintenanceID
+      }
     };
 
     const response = await fetch(ENDPOINT, {
@@ -66,7 +69,6 @@ export default function MaintenanceTable({ tableData, truckName, truckDate }: { 
       body: JSON.stringify(requestBody),
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": API_KEY,
       },
     });
 

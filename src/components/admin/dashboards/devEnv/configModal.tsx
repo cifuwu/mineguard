@@ -10,8 +10,7 @@ import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, Modal
 import { format } from 'date-fns';
 import InputField from 'components/fields/InputField';
 
-const ENDPOINT = "https://32meb447dzee7itae6f6enkqsq.appsync-api.sa-east-1.amazonaws.com/graphql";
-const API_KEY = "da2-hagplywtcnhr3hnq6cb63y4i2u";
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
 
 const ModalConfiguracion = ({ isOpen, onClose, }) => {
   const [frecuencia, setFrecuencia] = useState('');
@@ -40,10 +39,14 @@ const ModalConfiguracion = ({ isOpen, onClose, }) => {
 
     const requestBody = {
       query: `
-        mutation {
-          updateAutoPredConfig(frequency: ${frecuenciaSegundos}, initDate: "${formattedNextInitDate}")
+        mutation UpdateAutoPredConfig($frequency: Int!, $initDate: String!) {
+          updateAutoPredConfig(frequency: $frequency, initDate: $initDate)
         }
       `,
+      variables: {
+        "frequency": frecuenciaSegundos,
+        "initDate": formattedNextInitDate
+      }
     };
 
     try {
@@ -52,7 +55,6 @@ const ModalConfiguracion = ({ isOpen, onClose, }) => {
         body: JSON.stringify(requestBody),
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": API_KEY,
         },
       });
 

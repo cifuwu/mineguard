@@ -12,8 +12,7 @@ import Card from 'components/card/Card';
 import { Box, Flex, Grid, useColorModeValue } from '@chakra-ui/react';
 
 // Aws
-const ENDPOINT = "https://32meb447dzee7itae6f6enkqsq.appsync-api.sa-east-1.amazonaws.com/graphql";
-const API_KEY = "da2-hagplywtcnhr3hnq6cb63y4i2u";
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
 
 const DevelopPage = () => {
 
@@ -28,27 +27,27 @@ const DevelopPage = () => {
     // getTrucksInfo RequestBody
     const requestBody = {
         query: `
-            query MyQuery {
-              getTrucksInfo {
-                  idle {
+          query GetTrucksInfo {
+            getTrucksInfo {
+              idle {
+                truckID
+                name
+                components {
+                  componentID
                   name
-                  truckID
-                  components {
-                      componentID
-                      name
-                  }
-                  }
-                  operative {
+                }
+              }
+              operative {
+                truckID
+                name
+                components {
+                  componentID
                   name
-                  truckID
-                  components {
-                      componentID
-                      name
-                  }
-                  }
+                }
               }
-              }
-          `,
+            }
+          }
+      `,
     };
   
     // Fetch getTrucksInfo
@@ -57,7 +56,6 @@ const DevelopPage = () => {
       body: JSON.stringify(requestBody),
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": API_KEY,
       },
     })
       .then((response) => response.json())
@@ -75,7 +73,7 @@ const DevelopPage = () => {
     // getAutoPredConfig RequestBody
     const requestBody = {
       query: `
-        query {
+        query GetAutoPredConfig {
           getAutoPredConfig {
             frequency
             lastPredDate
@@ -91,7 +89,6 @@ const DevelopPage = () => {
       body: JSON.stringify(requestBody),
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": API_KEY,
       },
     })
       .then((response) => response.json())
@@ -106,30 +103,34 @@ const DevelopPage = () => {
   }, []);
 
   useEffect(() => {
-    const initialDate = "2024-06-28";
-    const lastDate = "2024-07-01";
+    const initialDate = "2024-08-28";
+    const lastDate = "2024-10-01";
 
     // getTrucksInfo RequestBody
     const requestBody = {
       query: `
-          query MyQuery {
-            getCalendar(initialDate: "${initialDate}", lastDate: "${lastDate}") {
-                date
-                trucks {
+        query GetCalendar($initialDate: String, $lastDate: String) {
+          getCalendar(initialDate: $initialDate, lastDate: $lastDate) {
+            date
+            trucks {
+              truckID
+              name
+              components {
+                maintenanceID
+                componentID
                 name
-                truckID
-                components {
-                    maintenanceID
-                    componentID
-                    done
-                    maintenance
-                    name
-                    priority
-                }
-                }
+                priority
+                maintenance
+                done
+              }
             }
-            }
-        `,
+          }
+        }
+      `,
+      variables: {
+        "initialDate": initialDate,
+        "lastDate": lastDate
+      }
     };
   
     // Fetch getTrucksInfo
@@ -138,7 +139,6 @@ const DevelopPage = () => {
       body: JSON.stringify(requestBody),
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": API_KEY,
       },
     })
       .then((response) => response.json())

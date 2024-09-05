@@ -110,7 +110,7 @@ function SidebarContent(props: {
           onClick={handleClick}
         >
           <Icon w="22px" h="22px" me="4px" as={FiLogOut} color="white" />
-          Cerrar sesión
+          {mini ? "" : "Cerrar sesión"}
         </Button>
       </Flex>
     </Flex>

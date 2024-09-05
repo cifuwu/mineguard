@@ -32,7 +32,7 @@ import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
 import NavLink from 'components/link/NavLink';
 import { set } from 'date-fns';
 
-const ENDPOINT = "http://localhost:4000";
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
 
 function SignIn() {
   // Chakra color mode

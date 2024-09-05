@@ -8,8 +8,7 @@ import PredictionGenerator from 'components/admin/dashboards/devPred/predictionG
 import Card from 'components/card/Card';
 import TimelineItem from 'components/dataDisplay/TimelineItem';
 
-const ENDPOINT = "https://32meb447dzee7itae6f6enkqsq.appsync-api.sa-east-1.amazonaws.com/graphql";
-const API_KEY = "da2-hagplywtcnhr3hnq6cb63y4i2u";
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
 
 const ManualPredictionPage = () => {
   const [selectedTruck, setSelectedTruck] = useState(null);
@@ -25,17 +24,17 @@ const ManualPredictionPage = () => {
     // getTrucksAndComponents RequestBody
     const requestBody = {
       query: `
-          query MyQuery {
-            getTrucksAndComponents {
-                name
-                truckID
-                components {
-                    componentID
-                    name
-                }
+        query GetTrucksAndComponents {
+          getTrucksAndComponents {
+            truckID
+            name
+            components {
+              componentID
+              name
             }
+          }
         }
-        `,
+      `,
     };
   
     // Fetch getTrucksAndComponents
@@ -44,7 +43,6 @@ const ManualPredictionPage = () => {
       body: JSON.stringify(requestBody),
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": API_KEY,
       },
     })
       .then((response) => response.json())
@@ -100,7 +98,6 @@ const ManualPredictionPage = () => {
       body: JSON.stringify(requestBody),
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": API_KEY,
       },
     })
       .then((response) => response.json())

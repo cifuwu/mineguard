@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 
 import AlertsTable from 'components/alerts/AlertsTable';
 
-const ENDPOINT = "http://localhost:4000";
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
 
 const requestBody = {
   query: `

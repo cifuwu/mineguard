@@ -33,7 +33,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { RiEyeCloseLine } from 'react-icons/ri';
 
-const ENDPOINT = "http://localhost:4000";
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
 
 function SignUp() {
   // Chakra color mode
