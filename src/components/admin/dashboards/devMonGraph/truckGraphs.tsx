@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import {  Flex, Grid, GridItem, Box, Text, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, FormControl, FormLabel, Input, RadioGroup, Radio, Stack } from '@chakra-ui/react';
-import { EditIcon, SettingsIcon } from '@chakra-ui/icons';
+import {  Flex, Grid, GridItem, Box, Text, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, FormControl, FormLabel, Input, RadioGroup, Radio, Stack, Icon, useColorModeValue } from '@chakra-ui/react';import { EditIcon, SettingsIcon } from '@chakra-ui/icons';
 import VariableChart from './variableChart';
 import ThresholdModal from './modalChart';
+import { ImCog } from "react-icons/im";
+import GraphConfigModal from './graphConfigModal';
 
 interface Variable {
   value: number;
@@ -34,8 +35,11 @@ interface ChartData {
 const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
   const variables = data.variables;
   // const date = data.date;
+  const textColorSecondary = useColorModeValue('secondaryGray.700', 'white');
+  const boxBg = useColorModeValue('secondaryGray.400', 'whiteAlpha.100');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedChart, setSelectedChart] = useState<string | null>(null);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [thresholdType, setThresholdType] = useState<'max' | 'min'>('max');
   const [thresholdValue, setThresholdValue] = useState<string>('');
   const [charts, setCharts] = useState<ChartData[]>(
@@ -66,6 +70,9 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
     setCharts(updatedCharts);
   }, [data]);
   
+  const closeConfigModal = () => {
+    setIsConfigModalOpen(false);
+  };
 
 
   useEffect(()=>{
@@ -101,10 +108,31 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
     closeModal();
   };
 
+  const handleOpenConfigurationModal = () => {
+    setIsConfigModalOpen(true);
+  }
+
   return (
     <div style={{ padding: '100px' }}>
       
-      <Text fontSize="xl" fontWeight="bold" pb={4}>Monitorización Camión {data.truck} {data.serie}</Text>
+      <Flex justifyContent="space-between">
+        <Text fontSize="xl" fontWeight="bold" pb={4}>Monitorización Camión {data.truck} {data.serie}</Text>
+        <Button
+            bg={boxBg}
+            fontSize="sm"
+            fontWeight="500"
+            color={textColorSecondary}
+            borderRadius="7px"
+            onClick={handleOpenConfigurationModal}
+            >
+            <Icon
+              as={ImCog}
+              color={textColorSecondary}
+              me="4px"
+            />
+            Configurar gráficos
+          </Button>
+      </Flex>
 
       <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={6}>
         {charts.map((chart, index) => (
@@ -149,6 +177,7 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
         setThresholdValue={setThresholdValue}
         applyThreshold={applyThreshold}
       />
+      <GraphConfigModal isOpen={isConfigModalOpen} onClose={closeConfigModal} />
     </div>
   );
 };
