@@ -3,37 +3,55 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Box, Text, Flex, Icon } from '@chakra-ui/react';
 import { FaArrowRight } from 'react-icons/fa';
+import io from 'socket.io-client';
+
+const SOCKET_URL = 'wss://ab7d-190-44-116-48.ngrok-free.app'; // Reemplaza con tu URL
 
 const TruckMonitoringPage = () => {
   const [trucksData, setTrucksData] = useState([]);
 
   useEffect(() => {
     const websockets = [];
-    for (let i = 50000; i < 50021; i++) {
-      const ws = new WebSocket(
-        `wss://ab7d-190-44-116-48.ngrok-free.app/ws?serie=A${i}`
-      );
+    
+    for (let i = 50000; i <= 50020; i++) {
+      const serie = `A${i}`;
+      const socket = io(SOCKET_URL, {
+        query: { serie } // Pasar la serie en la consulta
+      });
 
-      ws.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        // Solo extraemos los datos que necesitas: truck, serie, serviceTime, lat, lon
-        const truckData = {
-          truck: msg.truck,
-          serie: msg.serie,
-          serviceTime: msg.serviceTime,
-          position: {
-            lat: msg.position.lat,
-            lon: msg.position.lon
-          }
-        };
-        setTrucksData((prevData) => [...prevData, truckData]);
-      };
+      websockets.push(socket);
+      
+      socket.on('connect', () => {
+        console.log(`Connected to series ${serie}`);
+      });
 
-      websockets.push(ws);
+      socket.on('message', (data) => {
+        try {
+          const msg = JSON.parse(data);
+
+          const truckData = {
+            truck: msg.truck,
+            serie: msg.serie,
+            conductor: msg.conductor,
+            serviceTime: msg.serviceTime,
+            position: {
+              lat: msg.position.lat,
+              lon: msg.position.lon
+            }
+          };
+          setTrucksData((prevData) => [...prevData, truckData]);
+        } catch (error) {
+          console.error('Error parsing message data:', error);
+        }
+      });
+
+      socket.on('disconnect', () => {
+        console.log(`Disconnected from series ${serie}`);
+      });
     }
 
     return () => {
-      websockets.forEach((ws) => ws.close());
+      websockets.forEach((socket) => socket.disconnect());
     };
   }, []);
 
@@ -65,6 +83,7 @@ const TruckMonitoringPage = () => {
         >
           <Text fontSize="xl" fontWeight="bold">{truck.truck}</Text>
           <Text>Serie: {truck.serie}</Text>
+          <Text>Conductor: {truck.conductor}</Text>
           <Text>Horas de servicio: {truck.serviceTime} hrs</Text>
           <Text>Posición: lat {truck.position.lat}, lon {truck.position.lon}</Text>
           <Flex
