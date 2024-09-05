@@ -31,7 +31,7 @@ const VariableChart: React.FC<VariableChartProps> = ({ label, data, unit, thresh
   };
   
   const chartData = {
-    labels: dates,
+    labels: dates.map((caca)=>{return formatDate(caca)}),
     datasets: [
       {
         label: `${label} (${unit})`,

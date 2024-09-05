@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {  Flex, Grid, GridItem, Box, Text, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, FormControl, FormLabel, Input, RadioGroup, Radio, Stack } from '@chakra-ui/react';
 import { EditIcon, SettingsIcon } from '@chakra-ui/icons';
 import VariableChart from './variableChart';
@@ -47,6 +47,30 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
       // date: date,
     }))
   );
+
+  useEffect(() => {
+    const updatedCharts = charts.map((chart) => {
+      const variable = variables[chart.label];
+      if (variable) {
+        const updatedData = [...chart.data, variable.value].slice(-10);  // Mantiene solo los últimos 8 valores
+        const updatedDates = [...chart.dates, data.date].slice(-10);  // Mantiene solo las últimas 8 fechas
+        return {
+          ...chart,
+          data: updatedData,
+          dates: updatedDates,
+        };
+      }
+      return chart;
+    });
+  
+    setCharts(updatedCharts);
+  }, [data]);
+  
+
+
+  useEffect(()=>{
+    console.log(charts);
+  },[charts])
 
   const openModal = (label: string) => {
     setSelectedChart(label);
