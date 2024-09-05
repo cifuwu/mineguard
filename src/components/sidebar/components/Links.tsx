@@ -56,7 +56,7 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
       window.location.href = '/manualprediction';
     }
     if (route.name === 'Monitorización') {
-      window.location.href = '/devMon';
+      window.location.href = '/monitorizacion';
     }
     if (route.name === 'Alertas') {
       window.location.href = '/alerts';

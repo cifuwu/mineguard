@@ -94,7 +94,7 @@ const routes: IRoute[] = [
   },
   {
     name: 'Monitorización',
-    path: '/monitorization',
+    path: '/monitorizacion',
     icon: (
       <Icon
         as={MdInsertChartOutlined}
