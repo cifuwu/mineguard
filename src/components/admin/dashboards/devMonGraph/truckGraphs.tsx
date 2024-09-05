@@ -23,17 +23,17 @@ interface Props {
 interface ChartData {
   label: string;
   data: number[];
+  dates: string[];
   unit: string;
   threshold?: {
     type: 'max' | 'min';
     value: number;
   };
-  date: string;
 }
 
 const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
   const variables = data.variables;
-  const date = data.date;
+  // const date = data.date;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedChart, setSelectedChart] = useState<string | null>(null);
   const [thresholdType, setThresholdType] = useState<'max' | 'min'>('max');
@@ -42,8 +42,9 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
     Object.entries(variables).map(([label, variable]) => ({
       label,
       data: [variable.value], 
+      dates: [data.date],
       unit: variable.unit,
-      date: date,
+      // date: date,
     }))
   );
 
@@ -108,7 +109,7 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
                 data={chart.data}
                 unit={chart.unit}
                 threshold={chart.threshold}
-                date = {chart.date}
+                dates = {chart.dates}
               />
             </Box>
           </GridItem>

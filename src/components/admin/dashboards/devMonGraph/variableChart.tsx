@@ -20,10 +20,10 @@ interface VariableChartProps {
     type: 'max' | 'min';
     value: number;
   };
-  date: string
+  dates: string[];
 }
 
-const VariableChart: React.FC<VariableChartProps> = ({ label, data, unit, threshold, date}) => {
+const VariableChart: React.FC<VariableChartProps> = ({ label, data, unit, threshold, dates}) => {
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -31,7 +31,7 @@ const VariableChart: React.FC<VariableChartProps> = ({ label, data, unit, thresh
   };
   
   const chartData = {
-    labels: data.map((_, index) => formatDate(date)),
+    labels: dates,
     datasets: [
       {
         label: `${label} (${unit})`,
