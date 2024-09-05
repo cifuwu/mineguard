@@ -5,7 +5,7 @@ import { Grid, Box, Text, Flex, Icon } from '@chakra-ui/react';
 import { FaArrowRight } from 'react-icons/fa';
 import io from 'socket.io-client';
 
-const SOCKET_URL = 'wss://ab7d-190-44-116-48.ngrok-free.app'; // Reemplaza con tu URL
+const SOCKET_URL = 'wss://ab7d-190-44-116-48.ngrok-free.app/ws'; // Reemplaza con tu URL
 
 const TruckMonitoringPage = () => {
   const [trucksData, setTrucksData] = useState([]);
@@ -15,19 +15,15 @@ const TruckMonitoringPage = () => {
     
     for (let i = 50000; i <= 50020; i++) {
       const serie = `A${i}`;
-      const socket = io(SOCKET_URL, {
-        query: { serie } // Pasar la serie en la consulta
-      });
+      const socket = new WebSocket(`${SOCKET_URL}?serie=${serie}`);
 
       websockets.push(socket);
-      
-      socket.on('connect', () => {
-        console.log(`Connected to series ${serie}`);
-      });
 
-      socket.on('message', (data) => {
-        try {
+      socket.onmessage = (event) => {
+          const data = event.data;
           const msg = JSON.parse(data);
+
+          //console.log(msg);
 
           const truckData = {
             truck: msg.truck,
@@ -39,21 +35,41 @@ const TruckMonitoringPage = () => {
               lon: msg.position.lon
             }
           };
-          setTrucksData((prevData) => [...prevData, truckData]);
-        } catch (error) {
-          console.error('Error parsing message data:', error);
-        }
-      });
 
-      socket.on('disconnect', () => {
-        console.log(`Disconnected from series ${serie}`);
-      });
+
+          setTrucksData((prevData) => {
+            const existingIndex = prevData.findIndex(truck => truck.serie === truckData.serie);
+    
+            if (existingIndex !== -1) {
+              // Si ya existe, actualiza el objeto existente
+              const updatedData = [...prevData];
+              updatedData[existingIndex] = truckData;
+              return updatedData;
+            } else {
+              // Si no existe, lo agrega
+              return [...prevData, truckData];
+            }
+          });
+          
+      };
+
+
+      socket.onclose = () => {
+        console.log('WebSocket cerrado');
+    };
+
+    socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+
+
     }
 
     return () => {
-      websockets.forEach((socket) => socket.disconnect());
+      websockets.forEach((socket) => socket.close());
     };
   }, []);
+
 
   const handleArrowClick = (serie) => {
     window.location.href = `/devMonChart?serie=${encodeURIComponent(serie)}`;
