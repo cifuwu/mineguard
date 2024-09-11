@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import {  Flex, Grid, GridItem, Box, Text, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, FormControl, FormLabel, Input, RadioGroup, Radio, Stack, Icon, useColorModeValue } from '@chakra-ui/react';import { EditIcon, SettingsIcon } from '@chakra-ui/icons';
-import VariableChart from './variableChart';
-import ThresholdModal from './modalChart';
+import {  Flex, Grid, GridItem, Box, Text, IconButton, Button, Icon, useColorModeValue } from '@chakra-ui/react';import { EditIcon, SettingsIcon } from '@chakra-ui/icons';
+import VariableChart from 'components/admin/dashboards/devMonGraph/variableChart';
 import { ImCog } from "react-icons/im";
-import GraphConfigModal from './graphConfigModal';
+import GraphConfigModal from 'components/admin/dashboards/devMonGraph/graphConfigModal';
+import ThresholdModal from 'components/admin/dashboards/devMonGraph/thresholdModal';
+
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
 
 interface Variable {
   value: number;
@@ -37,11 +39,15 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
   // const date = data.date;
   const textColorSecondary = useColorModeValue('secondaryGray.700', 'white');
   const boxBg = useColorModeValue('secondaryGray.400', 'whiteAlpha.100');
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedChart, setSelectedChart] = useState<string | null>(null);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
-  const [thresholdType, setThresholdType] = useState<'max' | 'min'>('max');
-  const [thresholdValue, setThresholdValue] = useState<string>('');
+
+  const [isThresholdModalOpen, setIsThresholdModalOpen] = useState(false);
+  const [thresholdLabel, setThresholdLabel] = useState('');
+  const [thresholdUnit, setThresholdUnit] = useState('');
+
+  const [variableConfig, setVariableConfig] = useState([]);  // Umbrales
+
   const [charts, setCharts] = useState<ChartData[]>(
     Object.entries(variables).map(([label, variable]) => ({
       label,
@@ -70,26 +76,13 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
     setCharts(updatedCharts);
   }, [data]);
   
-  const closeConfigModal = () => {
-    setIsConfigModalOpen(false);
-  };
-
-
+  
+  
   useEffect(()=>{
     console.log(charts);
   },[charts])
 
-  const openModal = (label: string) => {
-    setSelectedChart(label);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setThresholdType('max');
-    setThresholdValue('');
-  };
-
+  /*
   const applyThreshold = () => {
     if (selectedChart !== null && thresholdValue !== '') {
       const updatedCharts = charts.map((chart) =>
@@ -107,10 +100,100 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
     }
     closeModal();
   };
+  */
 
-  const handleOpenConfigurationModal = () => {
+  const openConfigurationModal = () => {
     setIsConfigModalOpen(true);
   }
+  const closeConfigModal = () => {
+    setIsConfigModalOpen(false);
+  };
+  const openThresholdModal = (label, unit) => {
+    setThresholdLabel(label);
+    setThresholdUnit(unit);
+    setIsThresholdModalOpen(true);
+  }
+  const closeThresholdModal = () => {
+    setIsThresholdModalOpen(false);
+  };
+  
+  useEffect(() => {
+
+    const requestBody = {
+      query: `
+        query VariableConfig {
+          variableConfig {
+            variable
+            unit
+            threshold {
+              visible
+              value
+            }
+            maximum {
+              visible
+              value
+            }
+          }
+        }
+      `,
+    };
+    
+    // fetch variableConfig
+    fetch(ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.errors) {
+          console.error("Error:", data.errors[0].message);
+        }
+        if (data && data.data && data.data.variableConfig) {
+          console.log(data.data.variableConfig);
+          setVariableConfig(data.data.variableConfig);
+        }
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+      });
+
+  }, []);
+
+  const findVariableConfig = (label: string, config: any) => {
+    return config.find((item: any) => item.variable === label);
+  };
+  const currentConfig = findVariableConfig(thresholdLabel, variableConfig);
+
+  const handleSave = (newValues: {
+    maxThreshold: number;
+    minThreshold: number;
+    isMaxThresholdVisible: boolean;
+    isMinThresholdVisible: boolean;
+  }) => {
+    console.log('Valores guardados:', newValues);
+
+    const updatedConfig = variableConfig.map((config) =>
+      config.variable === thresholdLabel
+        ? {
+            ...config,
+            threshold: {
+              ...config.threshold,
+              value: newValues.minThreshold,
+              visible: newValues.isMinThresholdVisible,
+            },
+            maximum: {
+              ...config.maximum,
+              value: newValues.maxThreshold,
+              visible: newValues.isMaxThresholdVisible,
+            },
+          }
+        : config
+    );
+    setVariableConfig(updatedConfig);
+  };
 
   return (
     <div style={{ padding: '100px' }}>
@@ -123,7 +206,7 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
             fontWeight="500"
             color={textColorSecondary}
             borderRadius="7px"
-            onClick={handleOpenConfigurationModal}
+            onClick={openConfigurationModal}
             >
             <Icon
               as={ImCog}
@@ -153,7 +236,7 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
                 position="absolute"
                 top={2}
                 right={2}
-                onClick={() => openModal(chart.label)}
+                onClick={() => openThresholdModal(chart.label, chart.unit)}
                 aria-label="Edit chart"
               />
               <VariableChart
@@ -168,15 +251,17 @@ const TruckGraphsGrid: React.FC<Props> = ({ data }) => {
         ))}
       </Grid>
 
-      <ThresholdModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        thresholdType={thresholdType}
-        setThresholdType={setThresholdType}
-        thresholdValue={thresholdValue}
-        setThresholdValue={setThresholdValue}
-        applyThreshold={applyThreshold}
-      />
+      {currentConfig && ( <ThresholdModal 
+        isOpen={isThresholdModalOpen} 
+        onClose={closeThresholdModal} 
+        label={thresholdLabel} 
+        unit={thresholdUnit}
+        maxThreshold={currentConfig.maximum.value}
+        minThreshold={currentConfig.threshold.value}
+        isMaxThresholdVisible={currentConfig.maximum.visible}
+        isMinThresholdVisible={currentConfig.threshold.visible}
+        onSave={handleSave}/>
+      )}
       <GraphConfigModal isOpen={isConfigModalOpen} onClose={closeConfigModal} />
     </div>
   );

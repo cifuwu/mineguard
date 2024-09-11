@@ -21,7 +21,7 @@ export default extendTheme(
   sliderStyles, // slider styles
   inputStyles, // input styles
   textareaStyles, // textarea styles
-  switchStyles, // switch styles
+  //switchStyles, // switch styles
   CardComponent, // card component
 );
 
