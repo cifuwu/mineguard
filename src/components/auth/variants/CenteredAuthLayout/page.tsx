@@ -10,7 +10,7 @@ import Navbar from 'components/navbar/NavbarAuth';
 import PropTypes from 'prop-types';
 import { PropsWithChildren } from 'react';
 
-interface CenteredAuthLayoutProps extends PropsWithChildren {
+interface CenteredAuthLayoutProps extends PropsWithChildren<{}> {
   children: JSX.Element;
   title?: string;
   description?: string;

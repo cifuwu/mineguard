@@ -8,7 +8,7 @@ import {
 } from 'react';
 
 export type NavLinkProps = NextLinkProps &
-  PropsWithChildren & {
+  PropsWithChildren<{}> & {
     styles?: CSSProperties;
     borderRadius?: ComponentProps<typeof NextLink>['style']['borderRadius'];
   };

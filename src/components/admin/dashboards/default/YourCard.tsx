@@ -39,7 +39,7 @@ import {
 } from 'react-icons/md';
 import { RiNetflixFill } from 'react-icons/ri';
 
-interface YourCardProps extends PropsWithChildren, ChakraProps {}
+interface YourCardProps extends PropsWithChildren<{}>, ChakraProps {}
 
 export default function YourCard(props: YourCardProps) {
   const { ...rest } = props;

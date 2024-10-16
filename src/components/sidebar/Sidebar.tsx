@@ -32,7 +32,7 @@ import { isWindowAvailable } from 'utils/navigation';
 import CustomScrollbars from 'components/CustomScrollbars';
 
 
-export interface SidebarProps extends PropsWithChildren {
+export interface SidebarProps extends PropsWithChildren<{}> {
   routes: IRoute[];
 }
 

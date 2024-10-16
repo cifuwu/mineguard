@@ -9,7 +9,7 @@ import { FaChevronLeft } from 'react-icons/fa';
 import NavLink from 'components/link/NavLink';
 import { PropsWithChildren } from 'react';
 
-interface DefaultAuthLayoutProps extends PropsWithChildren {
+interface DefaultAuthLayoutProps extends PropsWithChildren<{}> {
   children: JSX.Element;
   illustrationBackground: string;
 }
