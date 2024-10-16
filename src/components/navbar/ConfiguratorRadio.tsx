@@ -1,12 +1,11 @@
-// Chakra Imports
 import {
   Button,
   Flex,
   useColorModeValue,
   Radio,
-  useRadio,
+  useCheckbox,
 } from '@chakra-ui/react';
-// Assets
+
 export default function HeaderLinks(props: { [x: string]: any }) {
   const borderButton = useColorModeValue('secondaryGray.100', 'whiteAlpha.200');
   const activeShadow = useColorModeValue(
@@ -15,9 +14,11 @@ export default function HeaderLinks(props: { [x: string]: any }) {
   );
   const Bg = useColorModeValue('white', 'navy.700');
   const activeBg = useColorModeValue('#F7F9FF', 'whiteAlpha.100');
-  //eslint-disable-next-line
-  const { getInputProps, getCheckboxProps } = useRadio(props);
+  
+  // Cambiamos a useCheckbox en lugar de useRadio
+  const { getInputProps, getCheckboxProps } = useCheckbox(props);
   const input = getInputProps();
+
   return (
     <Button
       h="max-content"

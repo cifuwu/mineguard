@@ -29,6 +29,8 @@ import { IRoute } from 'types/navigation';
 import { useContext } from 'react';
 import { ConfiguratorContext } from 'contexts/ConfiguratorContext';
 import { isWindowAvailable } from 'utils/navigation';
+import CustomScrollbars from 'components/CustomScrollbars';
+
 
 export interface SidebarProps extends PropsWithChildren {
   routes: IRoute[];
@@ -85,7 +87,7 @@ function Sidebar(props: { routes: IRoute[]; [x: string]: any }) {
         overflowX="hidden"
         boxShadow={shadow}
       >
-        <Scrollbars
+        <CustomScrollbars
           autoHide
           renderTrackVertical={renderTrack}
           renderThumbVertical={renderThumb}
@@ -98,7 +100,7 @@ function Sidebar(props: { routes: IRoute[]; [x: string]: any }) {
           }
         >
           <Content mini={mini} hovered={hovered} routes={routes} />
-        </Scrollbars>
+        </CustomScrollbars>
       </Box>
     </Box>
   );
@@ -162,14 +164,14 @@ export function SidebarResponsive(props: {
             _hover={{ boxShadow: 'none' }}
           />
           <DrawerBody maxW="285px" px="0rem" pb="0">
-            <Scrollbars
+            <CustomScrollbars
               autoHide
               renderTrackVertical={renderTrack}
               renderThumbVertical={renderThumb}
               renderView={renderView}
             >
               <Content mini={false} routes={routes} />
-            </Scrollbars>
+            </CustomScrollbars>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
