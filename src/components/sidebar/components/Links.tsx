@@ -21,10 +21,11 @@ import {
 import { FaCircle } from 'react-icons/fa';
 import NavLink from 'components/link/NavLink';
 import { IRoute } from 'types/navigation';
-import { PropsWithChildren, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
+import { PropsWithChildren, useCallback, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
+  const router = useRouter();
   const pathname = usePathname();
   //   Chakra color mode
   let activeColor = useColorModeValue('gray.700', 'white');
@@ -44,22 +45,29 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
     [pathname],
   );
 
+  useEffect(()=>{
+    router.prefetch('/home');
+    router.prefetch('/manualprediction');
+    router.prefetch('/monitorizacion');
+    router.prefetch('/alerts');
+  },[])
+
   const handleAccordionClick = (event, route) => {
     event.preventDefault();
     event.stopPropagation();
     
     // Aquí puedes ejecutar la función personalizada que deseas al hacer clic
     if (route.name === 'Home') {
-      window.location.href = '/home';
+      router.push('/home');
     }
     if (route.name === 'Predicción Manual') {
-      window.location.href = '/manualprediction';
+      router.push('/manualprediction');
     }
     if (route.name === 'Monitorización') {
-      window.location.href = '/monitorizacion';
+      router.push('/monitorizacion');
     }
     if (route.name === 'Alertas') {
-      window.location.href = '/alerts';
+      router.push('/alerts');
     }
   };
 

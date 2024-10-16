@@ -3,8 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Box, Text, Flex, Icon } from '@chakra-ui/react';
 import { FaArrowRight } from 'react-icons/fa';
+import Link from 'next/link';
 
-const SOCKET_URL = 'wss://ab7d-190-44-116-48.ngrok-free.app/ws'; // Reemplaza con tu URL
+
+//  wss://ab7d-190-44-116-48.ngrok-free.app/ws
+const SOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_ENDPOINT;
+
+
 
 const TruckMonitoringPage = () => {
   const [trucksData, setTrucksData] = useState([]);
@@ -101,18 +106,23 @@ const TruckMonitoringPage = () => {
           <Text>Conductor: {truck.conductor}</Text>
           <Text>Horas de servicio: {truck.serviceTime} hrs</Text>
           <Text>Posición: lat {truck.position.lat}, lon {truck.position.lon}</Text>
-          <Flex
-            position="absolute"
-            bottom="2"
-            right="2"
-            align="center"
-            justify="center"
-            onClick={() => handleArrowClick(truck.serie)}
-            cursor="pointer"
-            zIndex="docked"
-          >
-            <Icon as={FaArrowRight} w={4} h={4} color="#FFFFFF" />
-          </Flex>
+          <Link
+            href={`/devMonChart?serie=${encodeURIComponent(truck.serie)}`}
+            >
+            <Flex
+              position="absolute"
+              bottom="2"
+              right="2"
+              align="center"
+              justify="center"
+              // onClick={() => handleArrowClick(truck.serie)}
+              cursor="pointer"
+              zIndex="docked"
+            >
+              <Icon as={FaArrowRight} w={4} h={4} color="#FFFFFF" />
+            </Flex>
+          </Link>
+          
         </Box>
       ))}
     </Grid>

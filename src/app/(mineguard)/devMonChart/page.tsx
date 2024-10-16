@@ -3,7 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import TruckGraphsGrid from 'components/admin/dashboards/devMonGraph/truckGraphs';
-const SOCKET_URL = 'wss://ab7d-190-44-116-48.ngrok-free.app/ws';
+import { useSearchParams } from 'next/navigation'
+
+
+const SOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_ENDPOINT;
 
 
 interface TruckData {
@@ -23,9 +26,9 @@ interface TruckData {
 
 const TruckMonitoringGraphs = () => {
   const [selectedTruckData, setSelectedTruckData] = useState<TruckData | undefined>();
+  const searchParams = useSearchParams();
+  const serie = searchParams.get('serie');
 
-  const params = new URLSearchParams(window.location.search);
-  const serie = params.get('serie');
 
   useEffect(()=>{
     const socket = new WebSocket(`${SOCKET_URL}?serie=${serie}`);
