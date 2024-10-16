@@ -1,14 +1,36 @@
 import {
-    Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Button, Input,
+    Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Button, Input, Flex, Checkbox, Text
   } from '@chakra-ui/react';
   import { useState } from 'react';
   
-  const AddItemModal = ({ isOpen, onClose, onAdd }) => {
-    const [itemName, setItemName] = useState('');
+  const AddItemModal = ({ type, items, isOpen, onClose, onAdd }) => {
+    const [selectedTrucks, setSelectedTrucks] = useState([]);
+    const [selectedDrivers, setSelectedDrivers] = useState([]);
+  
+    const toggleTruckSelection = (truckName) => {
+      setSelectedTrucks((prev) =>
+        prev.includes(truckName)
+          ? prev.filter((name) => name !== truckName)
+          : [...prev, truckName]
+      );
+    };
+
+    const toggleDriverSelection = (driverName) => {
+      setSelectedDrivers((prev) =>
+        prev.includes(driverName)
+          ? prev.filter((name) => name !== driverName)
+          : [...prev, driverName]
+      );
+    };
   
     const handleAdd = () => {
-      onAdd(itemName);
-      setItemName('');
+      if (type === 'truck') {
+        onAdd(selectedTrucks);  // Pasamos los camiones seleccionados al agregar
+        setSelectedTrucks([]);  // Limpiamos la selección
+      } else {
+        onAdd(selectedDrivers);
+        setSelectedDrivers([]);
+      }
       onClose();
     };
   
@@ -16,22 +38,41 @@ import {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Agregar Item</ModalHeader>
+          <ModalHeader>Selecciona los camiones</ModalHeader>
           <ModalBody>
-            <Input
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-              placeholder="Nombre del item"
-            />
+            {type === 'truck' ? 
+            (items.map((item, index) => (
+              <Flex key={index} justify="space-between" align="center" mb={2}>
+                <Text>{item.name}</Text>
+                <Checkbox
+                  isChecked={selectedTrucks.includes(item.name)}
+                  onChange={() => toggleTruckSelection(item.name)}
+                />
+              </Flex>
+            ))) : (
+              items.map((item, index) => (
+                <Flex key={index} justify="space-between" align="center" mb={2}>
+                  <Text>{item.name} {item.lastname}</Text>
+                  <Checkbox
+                    isChecked={selectedDrivers.includes(item.name.concat(" ", item.lastname))}
+                    onChange={() => toggleDriverSelection(item.name.concat(" ", item.lastname))}
+                  />
+                </Flex>
+              ))
+            )
+          }
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleAdd}>Agregar</Button>
+            <Button colorScheme="blue" onClick={handleAdd}>
+              Agregar
+            </Button>
             <Button onClick={onClose}>Cancelar</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
     );
   };
+  
   
   export default AddItemModal;
   

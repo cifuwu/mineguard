@@ -5,32 +5,126 @@ import HeaderConfig from 'components/admin/dashboards/devPdf/headerConfig';
 import ItemList from 'components/admin/dashboards/devPdf/itemList';
 import AlertsSettings from 'components/admin/dashboards/devPdf/alertsSettings';
 import AddItemModal from 'components/admin/dashboards/devPdf/modalConfig';
-import DownloadSection from 'components/admin/dashboards/devPdf/buttonDownload';
-import { Box, Flex, Text, Switch, Button } from '@chakra-ui/react';
+import { Box, Flex, Text, Switch } from '@chakra-ui/react';
+
+const trucksExample = [{
+  "name": "WA900-8R",
+  "serie": "A50000",
+  "variables": ["Presion", "Temperatura"]
+},
+{
+  "name": "WE1850",
+  "serie": "A50001",
+  "variables": ["Aceite", "Carga"]
+}];
+
+const driversExample = [{
+  "name": "Nicolas",
+  "lastname": "Vargas"
+},
+{
+  "name": "Sebastian",
+  "lastname": "Cifuentes"
+}];
 
 const MainPage = () => {
-  // Actualización de los estados iniciales con objetos complejos
-  const [trucks, setTrucks] = useState([
-    { name: 'Camión 1', series: 'ABC123' },
-    { name: 'Camión 2', series: 'XYZ456' },
-    { name: 'Camión 3', series: 'DEF789' },
-  ]);
+  // Estado de camiones y conductores
+  const [selectedTruck, setSelectedTruck] = useState('');
+  const [selectedDriver, setSelectedDriver] = useState('');
 
-  const [drivers, setDrivers] = useState([
-    { firstName: 'Nicolás', lastName: '' },
-    { firstName: 'Brandon', lastName: '' },
-    { firstName: 'Hugo', lastName: '' },
-  ]);
-
+  const [trucks, setTrucks] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('');
-  
-  // Estados para manejar los switches de camiones y conductores
+
+  // Estados para switches
   const [isTrucksEnabled, setIsTrucksEnabled] = useState(true);
   const [isDriversEnabled, setIsDriversEnabled] = useState(true);
 
-  const handleAddTruck = (truck) => setTrucks([...trucks, truck]);
-  const handleAddDriver = (driver) => setDrivers([...drivers, driver]);
+  const [selectedVariables, setSelectedVariables] = useState({});
+
+  const handleVariableToggle = (truckName, variable) => {
+    setSelectedVariables((prev) => {
+      console.log(prev);
+      // Si no existe la llave truckName, inicializa con un objeto que tenga las llaves 'variables' y 'alerts'
+      const currentTruck = prev[truckName] || { variables: [], alerts: [], includeAlerts: false, includeVarHistory: false };
+      const currentVariables = currentTruck.variables;
+      const currentAlerts = currentTruck.alerts;
+  
+      if (['Resuelto', 'Leido', 'NoLeido'].includes(variable)) {
+        // Manejo de alertas
+        if (currentAlerts.includes(variable)) {
+          // Eliminar alerta si ya está seleccionada
+          return {
+            ...prev,
+            [truckName]: {
+              ...currentTruck, // Mantiene las variables existentes
+              alerts: currentAlerts.filter(v => v !== variable), // Actualiza las alertas
+            },
+          };
+        } else {
+          // Agregar alerta si no está seleccionada
+          return {
+            ...prev,
+            [truckName]: {
+              ...currentTruck, // Mantiene las variables existentes
+              alerts: [...currentAlerts, variable], // Actualiza las alertas
+            },
+          };
+        }
+      } else {
+        // Manejo de variables
+        if (currentVariables.includes(variable)) {
+          // Eliminar variable si ya está seleccionada
+          return {
+            ...prev,
+            [truckName]: {
+              ...currentTruck, // Mantiene las alertas existentes
+              variables: currentVariables.filter(v => v !== variable), // Actualiza las variables
+            },
+          };
+        } else {
+          // Agregar variable si no está seleccionada
+          return {
+            ...prev,
+            [truckName]: {
+              ...currentTruck, // Mantiene las alertas existentes
+              variables: [...currentVariables, variable], // Actualiza las variables
+            },
+          };
+        }
+      }
+    });
+  };
+
+  const handleSwitchToggle = (truckName, field) => {
+    setSelectedVariables((prev) => {
+      console.log(prev);
+      const currentTruck = prev[truckName] || { variables: [], alerts: [], includeAlerts: false, includeVarHistory: false };
+      
+      return {
+        ...prev,
+        [truckName]: {
+          ...currentTruck,
+          [field]: !currentTruck[field], // Alterna el valor booleano del campo
+        },
+      };
+    });
+  };
+  
+  // Función para añadir camiones seleccionados desde el modal
+  const handleAddTruck = (selectedTruckNames) => {
+    const selectedTrucks = trucksExample.filter(truck => selectedTruckNames.includes(truck.name));
+    setTrucks(selectedTrucks);
+  };
+  const handleAddDriver = (selectedDriverNames) => {
+    console.log(selectedDriverNames);
+    const selectedDrivers = driversExample.filter(driver => selectedDriverNames.includes(driver.name.concat(" ", driver.lastname)));
+    setDrivers(selectedDrivers);
+  };
+  //const handleAddDriver = (driver) => setDrivers([...drivers, driver]);
+
   const handleRemoveTruck = (index) => setTrucks(trucks.filter((_, i) => i !== index));
   const handleRemoveDriver = (index) => setDrivers(drivers.filter((_, i) => i !== index));
 
@@ -49,59 +143,55 @@ const MainPage = () => {
             items={trucks}
             onAdd={() => { setModalType('truck'); setIsModalOpen(true); }}
             onRemove={handleRemoveTruck}
-            type="truck"
             isEnabled={isTrucksEnabled}
             onToggle={() => setIsTrucksEnabled(!isTrucksEnabled)}
+            setSelectedTruck={setSelectedTruck}
+            setSelectedDriver={setSelectedDriver}
           />
 
           {/* Alertas para los camiones */}
-          {isTrucksEnabled && (
+          {isTrucksEnabled && selectedTruck && (
             <AlertsSettings
-              settings={{
-                alerts: true,
-                options: [
-                  { label: 'Historial de Variables', checked: true },
-                  { label: 'Presión en ruedas', checked: true },
-                  { label: 'Nivel de aceite', checked: false },
-                  { label: 'Amortiguadores', checked: false },
-                ]
-              }}
-              onToggle={() => {}}
+              variables={trucksExample.find(truck => truck.name === selectedTruck)?.variables || []}
+              selectedVariables={selectedVariables[selectedTruck]?.variables || []}
+              selectedAlerts={selectedVariables[selectedTruck]?.alerts || []}
+              selectedIncludeAlerts={selectedVariables[selectedTruck]?.includeAlerts || false}
+              selectedIncludeVarHistory={selectedVariables[selectedTruck]?.includeVarHistory || false}
+              onToggle={handleVariableToggle}
+              onSwitchToggle={handleSwitchToggle}
+              truckName={selectedTruck}
             />
           )}
         </Flex>
       </Flex>
 
-      {/* Sección de Conductores */}
-      <Flex direction="column" mb={8} alignItems="flex-start"> {/* Alineación a la izquierda */}
+
+
+
+      <Flex direction="column" mb={8} alignItems="flex-start">
         <Flex>
-          {/* Lista de Conductores con switch dentro */}
+          {/* Lista de Camiones con switch dentro */}
           <ItemList
             title="Conductores"
             items={drivers}
             onAdd={() => { setModalType('driver'); setIsModalOpen(true); }}
             onRemove={handleRemoveDriver}
-            type="driver"
             isEnabled={isDriversEnabled}
             onToggle={() => setIsDriversEnabled(!isDriversEnabled)}
+            setSelectedTruck={setSelectedTruck}
+            setSelectedDriver={setSelectedDriver}
           />
 
-          {/* Alertas para los conductores */}
-          {isDriversEnabled && (
-            <AlertsSettings
-              settings={{
-                alerts: true,
-                options: [{ label: 'Historial de actividad', checked: true }]
-              }}
-              onToggle={() => {}}
-            />
-          )}
+          
         </Flex>
       </Flex>
 
-      <DownloadSection/>
+      
 
+      {/* Modal para agregar camiones o conductores */}
       <AddItemModal
+        type={modalType}
+        items={modalType === 'truck' ? trucksExample : driversExample}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAdd={modalType === 'truck' ? handleAddTruck : handleAddDriver}

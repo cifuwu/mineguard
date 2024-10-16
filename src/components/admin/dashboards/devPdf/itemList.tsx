@@ -1,10 +1,9 @@
 'use client';
-import { Box, Flex, Text, IconButton, Switch, Button } from '@chakra-ui/react';
+import { Box, Flex, Text, IconButton, Switch, Button, Checkbox } from '@chakra-ui/react';
 import { DeleteIcon, AddIcon} from '@chakra-ui/icons'
 
+const ItemList = ({ title, items, onAdd, onRemove, isEnabled, onToggle, setSelectedTruck, setSelectedDriver }) => {
 
-
-const ItemList = ({ title, items, onAdd, onRemove, type, isEnabled, onToggle }) => {
   return (
     <Box bg="white" p={4} borderRadius="lg" boxShadow="md" w="300px" mr={10}>
       <Flex align="center" justify="space-between" mb={4}>
@@ -12,27 +11,31 @@ const ItemList = ({ title, items, onAdd, onRemove, type, isEnabled, onToggle }) 
         <Switch isChecked={isEnabled} onChange={onToggle} />
       </Flex>
 
-      {/* Mostrar lista solo si el switch está habilitado */}
+      {/* Mostrar lista de camiones solo si el switch está habilitado */}
       {isEnabled && (
         <>
-          {/* Lista de ítems con botón de eliminar */}
+          {/* Lista de camiones */}
           {items.map((item, index) => (
-            <Flex key={index} justify="space-between" align="center" mb={2}>
-              {type === "truck" ? (
-                <Text>{item.name} - {item.series}</Text> // Camión tiene nombre y serie
-              ) : (
-                <Text>{item.firstName} {item.lastName}</Text> // Conductor tiene nombre y apellido
-              )}
-              <Button
-                leftIcon={<DeleteIcon />}
-                aria-label="Eliminar"
-                onClick={() => onRemove(index)}
-                size="sm"
-              />
-            </Flex>
+            <Box key={index}>
+              <Flex
+                justify="space-between"
+                align="center"
+                mb={2}
+                onClick={() => {title === 'Camiones' ? setSelectedTruck(item.name) : setSelectedDriver}}
+                cursor="pointer"
+              >
+                <Text>{ title === 'Camiones' ? `${item.name} - ${item.serie}` : `${item.name} ${item.lastname}`}</Text>
+                <Button
+                  leftIcon={<DeleteIcon />}
+                  aria-label="Eliminar"
+                  onClick={() => onRemove(index)}
+                  size="sm"
+                />
+              </Flex>
+            </Box>
           ))}
 
-          {/* Botón para agregar un nuevo ítem */}
+          {/* Botón para agregar un nuevo camión */}
           <Box display="flex" justifyContent="center" alignItems="center">
             <Button
               leftIcon={<AddIcon />}
@@ -40,7 +43,7 @@ const ItemList = ({ title, items, onAdd, onRemove, type, isEnabled, onToggle }) 
               color="#7551FF"
               variant="outline"
               onClick={onAdd}
-              _hover={{ bg: "#F3F2FF" }} 
+              _hover={{ bg: "#F3F2FF" }}
             >
               Añadir
             </Button>
@@ -50,4 +53,5 @@ const ItemList = ({ title, items, onAdd, onRemove, type, isEnabled, onToggle }) 
     </Box>
   );
 };
+
 export default ItemList;
