@@ -45,7 +45,7 @@ const ItemList = ({ title, items, onAdd, onRemove, isEnabled, onToggle, setSelec
               onClick={onAdd}
               _hover={{ bg: "#F3F2FF" }}
             >
-              Añadir
+              Modificar
             </Button>
           </Box>
         </>

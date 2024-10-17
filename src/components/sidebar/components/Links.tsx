@@ -49,6 +49,9 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
     router.prefetch('/home');
     router.prefetch('/manualprediction');
     router.prefetch('/monitorizacion');
+    router.prefetch('/generate');
+    router.prefetch('/reports');
+    router.prefetch('/compare');
     router.prefetch('/alerts');
   },[])
 
@@ -65,6 +68,15 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
     }
     if (route.name === 'Monitorización') {
       router.push('/monitorizacion');
+    }
+    if (route.name === 'Generar Reporte') {
+      router.push('/generate');
+    }
+    if (route.name === 'Reportes') {
+      router.push('/reports');
+    }
+    if (route.name === 'Comparar') {
+      router.push('/compare');
     }
     if (route.name === 'Alertas') {
       router.push('/alerts');

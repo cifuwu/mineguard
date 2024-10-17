@@ -3,8 +3,10 @@ import {
   MdHome,
   MdInsertChartOutlined,
   MdOutlineLightbulb,
-  MdOutlineNotificationImportant
+  MdOutlineNotificationImportant,
+  MdCompareArrows
 } from 'react-icons/md';
+import { HiDocumentAdd, HiDocumentReport } from "react-icons/hi";
 
 // Auth Imports
 import { IRoute } from 'types/navigation';
@@ -98,6 +100,51 @@ const routes: IRoute[] = [
     icon: (
       <Icon
         as={MdInsertChartOutlined}
+        width="20px"
+        height="20px"
+        color="inherit"
+      />
+    ),
+    collapse: true,
+    items: [
+    ],
+  },
+  {
+    name: 'Generar Reporte',
+    path: '/generate',
+    icon: (
+      <Icon
+        as={HiDocumentAdd}
+        width="20px"
+        height="20px"
+        color="inherit"
+      />
+    ),
+    collapse: true,
+    items: [
+    ],
+  },
+  {
+    name: 'Reportes',
+    path: '/reports',
+    icon: (
+      <Icon
+        as={HiDocumentReport}
+        width="20px"
+        height="20px"
+        color="inherit"
+      />
+    ),
+    collapse: true,
+    items: [
+    ],
+  },
+  {
+    name: 'Comparar',
+    path: '/compare',
+    icon: (
+      <Icon
+        as={MdCompareArrows}
         width="20px"
         height="20px"
         color="inherit"
