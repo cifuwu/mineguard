@@ -86,7 +86,7 @@ type RowObj = {
   author: string;
   config: Config; // Aquí ahora reflejamos la estructura completa del campo config
   status: string;
-  download: string;
+  downloadUrl: string;
   actions: string;
 };
 
@@ -249,8 +249,8 @@ export default function ReportsTable(props: { tableData: RowObj[] }) {
                 </Text>
             ),
         }),
-        columnHelper.accessor('download', {
-            id: 'download',
+        columnHelper.accessor('downloadUrl', {
+            id: 'downloadUrl',
             header: () => (
                 <Text
                     justifyContent="space-between"
@@ -262,7 +262,7 @@ export default function ReportsTable(props: { tableData: RowObj[] }) {
                 </Text>
             ),
             cell: (info) => (
-              <Button isDisabled={info.row.getValue('status') !== 'Listo' ? true : false} p={0}>
+              <Button onClick={() => window.open(info?.cell?.row?.original?.downloadUrl, '_blank')} isDisabled={info.row.getValue('status') !== 'Listo' ? true : false} p={0}>
                 <Icon
                   as={MdDownload}
                   w={8}
