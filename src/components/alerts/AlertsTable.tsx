@@ -22,6 +22,7 @@ import * as React from 'react'
 import { useEffect } from 'react';
 // Assets
 import { SearchBar } from 'components/navbar/searchBar/SearchBar';
+import { usePathname, useRouter } from 'next/navigation';
 
 import {
   PaginationState,
@@ -52,12 +53,21 @@ type RowObj = {
 
 export default function AlertsTable(props: { tableData: RowObj[] }) {
     const { tableData } = props;
+    const router = useRouter();
     const textColor = useColorModeValue('navy.700', 'white');
     const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
     const brandColor = useColorModeValue('brand.500', 'brand.400');
 
     const [data, setData] = React.useState<RowObj[]>([]);
   
+    useEffect(()=>{
+        router.prefetch('/manualAlerts');
+      },[])
+
+    const handleManualAlert = () => {
+        router.push('/manualAlerts');
+    }
+
     useEffect(() => {
         setData(tableData);
     }, [tableData]);
@@ -305,7 +315,7 @@ export default function AlertsTable(props: { tableData: RowObj[] }) {
         >
             <Flex
                 align={{ sm: 'flex-start', lg: 'flex-start' }}
-                justify={{ sm: 'flex-start', lg: 'flex-start' }}
+                justify="space-between"
                 w="100%"
                 px="22px"
                 mb="36px"
@@ -316,6 +326,7 @@ export default function AlertsTable(props: { tableData: RowObj[] }) {
                     className="p-2 font-lg shadow border border-block"
                     placeholder="Search..."
                 />
+                <Button px={8} variant="brand" onClick={handleManualAlert}>Alerta Manual</Button>
             </Flex>
             <Table variant="simple" color="gray.500" mb="24px">
                 <Thead>
