@@ -4,6 +4,8 @@ import 'styles/App.css';
 import 'styles/Contact.css';
 import 'styles/Plugins.css';
 import 'styles/MiniCalendar.css';
+import 'leaflet/dist/leaflet.css';
+
 import { ChakraProvider } from '@chakra-ui/react';
 
 import dynamic from 'next/dynamic';
