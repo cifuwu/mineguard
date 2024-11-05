@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { Box, Button, Flex, HStack, Input, VStack, Text, Spacer } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, Input, VStack, Text, Spacer, useColorModeValue } from '@chakra-ui/react';
 import L from 'leaflet';
 import { GiMineTruck } from 'react-icons/gi';
 import ReactDOMServer from 'react-dom/server';
+import Card from "components/card/Card";
 
 interface Truck {
   id: number;
@@ -32,6 +33,11 @@ const FollowTruck = ({ truck }: { truck: Truck | null }) => {
 };
 
 const TruckMap = () => {
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const boxColor = useColorModeValue('white', 'navy.900');
+  const boxBorderColor = useColorModeValue('gray.200', 'navy.900');
+  const boxBorderColorHighlighted = useColorModeValue('blue.500', 'brand.400');
+
   const [trucks, setTrucks] = useState<Truck[]>(initialData);
   const [followedTruck, setFollowedTruck] = useState<Truck | null>(null);
   const [highlightedTruck, setHighlightedTruck] = useState<Truck | null>(null);
@@ -74,7 +80,7 @@ const TruckMap = () => {
 
   return (
 
-    <Flex height="100vh" p={20}> 
+    <Flex height="90vh" p={20}> 
       {/* Mapa */}
       <Box height="100%" width="70%" paddingRight="10px" mt={15}> 
         <MapContainer center={[-33.0458, -71.6197]} zoom={14} style={{ height: '100%', width: '100%' }}>
@@ -118,7 +124,7 @@ const TruckMap = () => {
       </Box>
 
       {/* Panel lateral */}
-      <Box width="30%" padding={4} bg="gray.50" overflowY="auto" display="flex" flexDirection="column" mt={15}>
+      <Card width="30%" padding={4} overflowY="auto" display="flex" flexDirection="column" mt={15}>
         <VStack spacing={4} align="start" flex="1" overflowY="auto">
           {/* Lista de camiones */}
           {filteredTrucks.map(truck => (
@@ -128,13 +134,13 @@ const TruckMap = () => {
               padding={2}
               borderWidth="1px"
               borderRadius="md"
-              borderColor={truck.id === highlightedTruck?.id ? 'blue.500' : 'gray.200'}
-              bg={truck.visible ? 'white' : 'gray.200'}
+              borderColor={truck.id === highlightedTruck?.id ? boxBorderColorHighlighted : boxBorderColor}
+              bg={boxColor}
             >
-              <Text fontWeight="bold">{`${truck.model} - ${truck.serie}`}</Text>
+              <Text color={textColor} fontWeight="bold">{`${truck.model} - ${truck.serie}`}</Text>
               <HStack spacing={2} mt={2}>
-                <Button size="sm" onClick={() => setHighlightedTruck(truck)}>
-                  Destacar
+                <Button size="sm" onClick={() => highlightedTruck?.id === truck.id ? setHighlightedTruck(null) : setHighlightedTruck(truck)}>
+                  {highlightedTruck?.id === truck.id ? 'No Destacar' : 'Destacar'}
                 </Button>
                 <Button
                   size="sm"
@@ -151,7 +157,7 @@ const TruckMap = () => {
                   onClick={() => followedTruck?.id === truck.id ? setFollowedTruck(null) : setFollowedTruck(truck)}
                 >
                   {followedTruck?.id === truck.id ? 'Dejar de Seguir' : 'Seguir'}
-                </Button>
+                </Button>
               </HStack>
             </Box>
           ))}
@@ -160,12 +166,13 @@ const TruckMap = () => {
         {/* Input de filtro en la parte baja */}
         <Box mt={4} width="100%">
           <Input
+            color={textColor}
             placeholder="Filtrar por modelo"
             value={filter}
             onChange={e => setFilter(e.target.value)}
           />
         </Box>
-      </Box>
+      </Card>
     </Flex>
   );
 };
