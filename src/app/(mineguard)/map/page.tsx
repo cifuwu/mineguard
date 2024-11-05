@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { Box, Button, Flex, HStack, Input, VStack, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, Input, VStack, Text, Spacer } from '@chakra-ui/react';
 import L from 'leaflet';
 import { GiMineTruck } from 'react-icons/gi';
 import ReactDOMServer from 'react-dom/server';
@@ -17,15 +17,15 @@ interface Truck {
 }
 
 const initialData: Truck[] = [
-  { id: 1, name: 'Truck 1', model: 'A50000', serie: 'T1', position: { lat: -33.0458, lng: -71.6197 }, visible: true },
-  { id: 2, name: 'Truck 2', model: 'A50001', serie: 'T2', position: { lat: -33.0468, lng: -71.6207 }, visible: true },
+  { id: 1, name: 'Truck 1', model: 'T1', serie: 'A50000', position: { lat: -33.0458, lng: -71.6197 }, visible: true },
+  { id: 2, name: 'Truck 2', model: 'T2', serie: 'A50001', position: { lat: -33.0468, lng: -71.6207 }, visible: true },
 ];
 
 const FollowTruck = ({ truck }: { truck: Truck | null }) => {
   const map = useMap();
   useEffect(() => {
     if (truck) {
-      map.flyTo([truck.position.lat, truck.position.lng], 15);
+      map.flyTo([truck.position.lat, truck.position.lng], map.getZoom());
     }
   }, [truck, map]);
   return null;
@@ -36,6 +36,8 @@ const TruckMap = () => {
   const [followedTruck, setFollowedTruck] = useState<Truck | null>(null);
   const [highlightedTruck, setHighlightedTruck] = useState<Truck | null>(null);
   const [filter, setFilter] = useState('');
+
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -61,12 +63,23 @@ const TruckMap = () => {
 
   const filteredTrucks = trucks.filter(truck => truck.model.includes(filter));
 
+  useEffect(() => {
+    if (followedTruck) {
+      const updatedTruck = trucks.find(truck => truck.id === followedTruck.id);
+      if (updatedTruck) {
+        setFollowedTruck(updatedTruck);
+      }
+    }
+  }, [trucks, followedTruck]);
+
   return (
-    <Flex height="100vh">
-      <Box height="100%" width="70%">
+
+    <Flex height="100vh" p={20}> 
+      {/* Mapa */}
+      <Box height="100%" width="70%" paddingRight="10px" mt={15}> 
         <MapContainer center={[-33.0458, -71.6197]} zoom={14} style={{ height: '100%', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
-          {trucks.map(truck => (
+          {filteredTrucks.map(truck => (
             truck.visible && (
               <Marker
                 key={truck.id}
@@ -74,14 +87,13 @@ const TruckMap = () => {
                 icon={truckIcon(truck.id === highlightedTruck?.id)}
               >
                 <Popup>
-                  <Text>{`${truck.name} - ${truck.model}`}</Text>
+                  <Text>{`${truck.name} - ${truck.serie}`}</Text>
                   <Button
                     size="sm"
                     colorScheme="blue"
                     mt={2}
                     onClick={() => {
-                      // Redirige a la página de monitoreo del camión seleccionado
-                      window.location.href = "/ruta-de-monitoreo";
+                      window.location.href =  `/devMonChart?serie=${truck.serie}`;    
                     }}
                   >
                     Monitorear
@@ -92,8 +104,7 @@ const TruckMap = () => {
                     mt={2}
                     ml={2}
                     onClick={() => {
-                      // Redirige a la página de alertas para el camión seleccionado
-                      window.location.href = "/ruta-de-alertas";
+                      window.location.href =  `/manualAlerts?serie=${truck.serie}`;
                     }}
                   >
                     Alertar
@@ -106,14 +117,10 @@ const TruckMap = () => {
         </MapContainer>
       </Box>
 
-      <Box width="30%" padding={4} bg="gray.50" overflowY="auto">
-        <VStack spacing={4} align="start">
-          <Input
-            placeholder="Filtrar por modelo"
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-            mb={4}
-          />
+      {/* Panel lateral */}
+      <Box width="30%" padding={4} bg="gray.50" overflowY="auto" display="flex" flexDirection="column" mt={15}>
+        <VStack spacing={4} align="start" flex="1" overflowY="auto">
+          {/* Lista de camiones */}
           {filteredTrucks.map(truck => (
             <Box
               key={truck.id}
@@ -141,14 +148,23 @@ const TruckMap = () => {
                 <Button
                   size="sm"
                   colorScheme="blue"
-                  onClick={() => setFollowedTruck(truck)}
+                  onClick={() => followedTruck?.id === truck.id ? setFollowedTruck(null) : setFollowedTruck(truck)}
                 >
-                  Seguir
-                </Button>
+                  {followedTruck?.id === truck.id ? 'Dejar de Seguir' : 'Seguir'}
+                </Button>
               </HStack>
             </Box>
           ))}
         </VStack>
+        
+        {/* Input de filtro en la parte baja */}
+        <Box mt={4} width="100%">
+          <Input
+            placeholder="Filtrar por modelo"
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+          />
+        </Box>
       </Box>
     </Flex>
   );
