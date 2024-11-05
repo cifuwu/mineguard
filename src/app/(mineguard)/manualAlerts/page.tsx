@@ -1,27 +1,43 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Box, Button, Textarea, Select, VStack } from "@chakra-ui/react";
+import { Box, Button, Textarea, Select, VStack, Alert, AlertIcon } from "@chakra-ui/react";
 import Card from "components/card/Card";
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 const ManualALertsPage = () => {
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const [serie, setSerie] = useState('');
+
+  const [serie, setSerie] = useState(searchParams.get("serie") || '');
   const [correctiveAction, setCorrectiveAction] = useState('');
   const [state, setState] = useState('');
+
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleBack = () => {
     router.push('/alerts');
   }
 
   const handleSend = () => {
+    if (!serie || !correctiveAction || !state) {
+      setAlertMessage('Por favor, rellena todos los campos enviar una alerta.');
+      return;
+    }
+    setAlertMessage('');
     console.log(serie, correctiveAction, state);
   }
 
   return (
     <Box paddingX={{md: '0', lg: '12%', xl: '15%' }}>
+
       <Card mt={{ base: '130px', md: '80px', xl: '80px' }}>
+      {alertMessage && (
+        <Alert status="warning" mb={4}>
+          <AlertIcon />
+          {alertMessage}
+        </Alert>
+      )}
         <VStack align="stretch" spacing={4}>
           <Select placeholder="Serie" value={serie} onChange={(e) => setSerie(e.target.value)}>
             <option value="serie1">Serie 1</option>
