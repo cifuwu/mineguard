@@ -1,241 +1,180 @@
 'use client';
 
-import React from 'react';
-import { useState, useEffect } from 'react'; 
-import { ChakraProvider } from '@chakra-ui/react';
-import TruckCounter from 'components/admin/dashboards/devEnv/truckCounter';
-import AutoPred from 'components/admin/dashboards/devEnv/autoPred';
-import HomeTimeline from 'components/admin/dashboards/devEnv/maintenanceCalendar';
-import MaintenanceTable from 'components/admin/dashboards/devEnv/maintenanceTable';
-import Card from 'components/card/Card';
-// Chakra imports
-import { Box, Flex, Grid, useColorModeValue } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { Box, Button, Flex, HStack, Input, VStack, Text, Spacer, useColorModeValue } from '@chakra-ui/react';
+import L from 'leaflet';
+import { GiMineTruck } from 'react-icons/gi';
+import ReactDOMServer from 'react-dom/server';
+import Card from "components/card/Card";
 
-// Aws
-const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
+interface Truck {
+  id: number;
+  name: string;
+  model: string;
+  serie: string;
+  position: { lat: number; lng: number };
+  visible: boolean;
+}
 
-const DevelopPage = () => {
+const initialData: Truck[] = [
+  { id: 1, name: 'Truck 1', model: 'T1', serie: 'A50000', position: { lat: -33.0458, lng: -71.6197 }, visible: true },
+  { id: 2, name: 'Truck 2', model: 'T2', serie: 'A50001', position: { lat: -33.0468, lng: -71.6207 }, visible: true },
+];
 
-  const [selectedTruck, setSelectedTruck] = useState<any | null>(null);
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [autoPredData, setAutoPredData] = useState<any | null>(null);
-  const [trucksInfoData, setTrucksInfoData] = useState<any | null>(null);
-  const [calendarData, setCalendarData] = useState<any | null>(null);
-
+const FollowTruck = ({ truck }: { truck: Truck | null }) => {
+  const map = useMap();
   useEffect(() => {
-    // getTrucksInfo RequestBody
-    const requestBody = {
-        query: `
-          query GetTrucksInfo {
-            getTrucksInfo {
-              idle {
-                truckID
-                name
-                components {
-                  componentID
-                  name
-                }
-              }
-              operative {
-                truckID
-                name
-                components {
-                  componentID
-                  name
-                }
-              }
-            }
-          }
-      `,
-    };
-  
-    // Fetch getTrucksInfo
-    fetch(ENDPOINT, {
-      method: "POST",
-      body: JSON.stringify(requestBody),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data.data && data.data.getTrucksInfo) {
-          setTrucksInfoData(data.data.getTrucksInfo);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching Trucks Info:", error);
-      });
-  }, []);
-  
-  useEffect(() => {
-    // getAutoPredConfig RequestBody
-    const requestBody = {
-      query: `
-        query GetAutoPredConfig {
-          getAutoPredConfig {
-            frequency
-            lastPredDate
-            nextPredDate
-          }
-        }
-      `,
-    };
-
-    // Fetch autoPredConfig
-    fetch(ENDPOINT, {
-      method: "POST",
-      body: JSON.stringify(requestBody),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data.data && data.data.getAutoPredConfig) {
-          setAutoPredData(data.data.getAutoPredConfig);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching auto prediction config:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    const initialDate = "2024-08-28";
-    const lastDate = "2024-10-01";
-
-    // getTrucksInfo RequestBody
-    const requestBody = {
-      query: `
-        query GetCalendar($initialDate: String, $lastDate: String) {
-          getCalendar(initialDate: $initialDate, lastDate: $lastDate) {
-            date
-            trucks {
-              truckID
-              name
-              components {
-                maintenanceID
-                componentID
-                name
-                priority
-                maintenance
-                done
-              }
-            }
-          }
-        }
-      `,
-      variables: {
-        "initialDate": initialDate,
-        "lastDate": lastDate
-      }
-    };
-  
-    // Fetch getTrucksInfo
-    fetch(ENDPOINT, {
-      method: "POST",
-      body: JSON.stringify(requestBody),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data.data && data.data.getCalendar) {
-          setCalendarData(data.data.getCalendar);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching Calendar Info:", error);
-      });
-  }, []);
-  console.log(calendarData);
-
-  const handleTruckClick = (truck: any, date: string) => {
-    setSelectedTruck(truck);
-    setSelectedDate(date);
-    const selectedTruckData = calendarData.find(entry => entry.date === date)?.trucks.find(t => t.truckID === truck.truckID);
-    if (selectedTruckData) {
-      setTableData(selectedTruckData.components.map((component: any) => ({
-        component: component.name,
-        priority: component.priority,
-        maintenance: component.maintenance,
-        done: component.done,
-        maintenanceID: component.maintenanceID,
-      })));
-    } else {
-      setTableData([]);
+    if (truck) {
+      map.flyTo([truck.position.lat, truck.position.lng], map.getZoom());
     }
-  };
+  }, [truck, map]);
+  return null;
+};
+
+const TruckMap = () => {
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const boxColor = useColorModeValue('white', 'navy.900');
+  const boxBorderColor = useColorModeValue('gray.200', 'navy.900');
+  const boxBorderColorHighlighted = useColorModeValue('blue.500', 'brand.400');
+
+  const [trucks, setTrucks] = useState<Truck[]>(initialData);
+  const [followedTruck, setFollowedTruck] = useState<Truck | null>(null);
+  const [highlightedTruck, setHighlightedTruck] = useState<Truck | null>(null);
+  const [filter, setFilter] = useState('');
+
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTrucks(prevTrucks =>
+        prevTrucks.map(truck => ({
+          ...truck,
+          position: {
+            lat: truck.position.lat + (Math.random() - 0.5) * 0.001,
+            lng: truck.position.lng + (Math.random() - 0.5) * 0.001,
+          },
+        }))
+      );
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const truckIcon = (highlight: boolean) =>
+    L.divIcon({
+      html: ReactDOMServer.renderToString(<GiMineTruck size="30" color={highlight ? 'red' : 'orange'} />),
+      className: 'custom-icon',
+      iconSize: [30, 30],
+    });
+
+  const filteredTrucks = trucks.filter(truck => truck.model.includes(filter));
+
+  useEffect(() => {
+    if (followedTruck) {
+      const updatedTruck = trucks.find(truck => truck.id === followedTruck.id);
+      if (updatedTruck) {
+        setFollowedTruck(updatedTruck);
+      }
+    }
+  }, [trucks, followedTruck]);
 
   return (
-    <Flex
-      direction={{ base: 'column', xl: 'row' }}
-      pt={{ base: '130px', md: '80px', xl: '80px' }}
-    >
-      <Flex direction="column" width="stretch">
-        <Grid
-          gap="40px"
-          gridTemplateColumns={{
-            md: 'repeat(4, 1fr)',
-            '2xl': 'repeat(4, 1fr)',
-          }}
-        >
-          <Flex gridArea={{ md: '1 / 1 / 1 / 2', '2xl': '1 / 1 / 1 / 2' }}>
-            {trucksInfoData ? (
-              <TruckCounter title="Máquinas operando" number={trucksInfoData.operative.length}/>
-            ) : (
-              <Card>Cargando...</Card>
-            )}
-          </Flex>
-          <Flex gridArea={{ md: '1 / 2 / 1 / 3', '2xl': '1 / 2 / 1 / 3' }}>
-            {trucksInfoData ? (
-              <TruckCounter title="Máquinas en espera de mantención" number={trucksInfoData.idle.length}/>
-            ) : (
-              <Card>Cargando...</Card>
-            )}
-          </Flex>
-          <Flex gridArea={{ md: '1 / 3 / 1 / 5', '2xl': '1 / 3 / 1 / 5' }}>
-          {autoPredData ? (
-              <AutoPred tableData={autoPredData}/>
-            ) : (
-              <Card>Cargando configuración de predicción...</Card>
-            )}
-          </Flex>
-        </Grid>
-        <Grid
-          gridTemplateColumns={{ base: '2.4fr 1fr', lg: '1fr 1.83fr' }}
-          gap={{ base: '20px', xl: '20px' }}
-          display={{ base: 'block', lg: 'grid' }}
-        >
-          <Box gridArea="2 / 1 / 2 / 4">
-            {calendarData ? (
-              <HomeTimeline data={calendarData} onTruckClick={handleTruckClick}/>
-            ) : (
-              <Card>Cargando...</Card>
-            )}
-          </Box>
-        </Grid>
-        <Grid
-          gridTemplateColumns={{ base: '2.4fr 1fr', lg: '1fr 1.83fr' }}
-          gap={{ base: '20px', xl: '20px' }}
-          display={{ base: 'block', lg: 'grid' }}
-        >
-          {selectedTruck && selectedDate && (
-            <Box mt={4} gridArea="2 / 1 / 2 / 4">
-              <MaintenanceTable
-                truckName={selectedTruck.name}
-                tableData={tableData}
-                truckDate={selectedDate}
-              />
+
+    <Flex height="90vh" p={20}> 
+      {/* Mapa */}
+      <Box height="100%" width="70%" paddingRight="10px" mt={15}> 
+        <MapContainer center={[-33.0458, -71.6197]} zoom={14} style={{ height: '100%', width: '100%' }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+          {filteredTrucks.map(truck => (
+            truck.visible && (
+              <Marker
+                key={truck.id}
+                position={truck.position}
+                icon={truckIcon(truck.id === highlightedTruck?.id)}
+              >
+                <Popup>
+                  <Text>{`${truck.name} - ${truck.serie}`}</Text>
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    mt={2}
+                    onClick={() => {
+                      window.location.href =  `/devMonChart?serie=${truck.serie}`;    
+                    }}
+                  >
+                    Monitorear
+                  </Button>
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    mt={2}
+                    ml={2}
+                    onClick={() => {
+                      window.location.href =  `/manualAlerts?serie=${truck.serie}`;
+                    }}
+                  >
+                    Alertar
+                  </Button>
+                </Popup>
+              </Marker>
+            )
+          ))}
+          <FollowTruck truck={followedTruck} />
+        </MapContainer>
+      </Box>
+
+      {/* Panel lateral */}
+      <Card width="30%" padding={4} overflowY="auto" display="flex" flexDirection="column" mt={15}>
+        <VStack spacing={4} align="start" flex="1" overflowY="auto">
+          {/* Lista de camiones */}
+          {filteredTrucks.map(truck => (
+            <Box
+              key={truck.id}
+              width="100%"
+              padding={2}
+              borderWidth="1px"
+              borderRadius="md"
+              borderColor={truck.id === highlightedTruck?.id ? boxBorderColorHighlighted : boxBorderColor}
+              bg={boxColor}
+            >
+              <Text color={textColor} fontWeight="bold">{`${truck.model} - ${truck.serie}`}</Text>
+              <HStack spacing={2} mt={2}>
+                <Button size="sm" onClick={() => highlightedTruck?.id === truck.id ? setHighlightedTruck(null) : setHighlightedTruck(truck)}>
+                  {highlightedTruck?.id === truck.id ? 'No Destacar' : 'Destacar'}
+                </Button>
+                <Button
+                  size="sm"
+                  colorScheme={truck.visible ? 'red' : 'green'}
+                  onClick={() =>
+                    setTrucks(trucks.map(t => (t.id === truck.id ? { ...t, visible: !t.visible } : t)))
+                  }
+                >
+                  {truck.visible ? 'Invisibilizar' : 'Visibilizar'}
+                </Button>
+                <Button
+                  size="sm"
+                  colorScheme="blue"
+                  onClick={() => followedTruck?.id === truck.id ? setFollowedTruck(null) : setFollowedTruck(truck)}
+                >
+                  {followedTruck?.id === truck.id ? 'Dejar de Seguir' : 'Seguir'}
+                </Button>
+              </HStack>
             </Box>
-          )}
-        </Grid>
-      </Flex>
+          ))}
+        </VStack>
+        
+        {/* Input de filtro en la parte baja */}
+        <Box mt={4} width="100%">
+          <Input
+            color={textColor}
+            placeholder="Filtrar por modelo"
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+          />
+        </Box>
+      </Card>
     </Flex>
   );
 };
 
-export default DevelopPage;
+export default TruckMap;
