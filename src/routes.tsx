@@ -4,9 +4,11 @@ import {
   MdInsertChartOutlined,
   MdOutlineLightbulb,
   MdOutlineNotificationImportant,
-  MdCompareArrows
+  MdCompareArrows,
+  MdManageAccounts
 } from 'react-icons/md';
 import { HiDocumentAdd, HiDocumentReport } from "react-icons/hi";
+import { RiLightbulbFlashLine } from "react-icons/ri";
 
 // Auth Imports
 import { IRoute } from 'types/navigation';
@@ -53,6 +55,21 @@ const routes: IRoute[] = [
         layout: '/rtl',
         path: '/dashboards/rtl',
       },
+    ],
+  },
+  {
+    name: 'Mantenciones',
+    path: '/maintenance',
+    icon: (
+      <Icon
+        as={RiLightbulbFlashLine}
+        width="20px"
+        height="20px"
+        color="inherit"
+      />
+    ),
+    collapse: true,
+    items: [
     ],
   },
   {
@@ -145,6 +162,21 @@ const routes: IRoute[] = [
     icon: (
       <Icon
         as={MdCompareArrows}
+        width="20px"
+        height="20px"
+        color="inherit"
+      />
+    ),
+    collapse: true,
+    items: [
+    ],
+  },
+  {
+    name: 'Gestión',
+    path: '/management',
+    icon: (
+      <Icon
+        as={MdManageAccounts}
         width="20px"
         height="20px"
         color="inherit"

@@ -47,11 +47,13 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
 
   useEffect(()=>{
     router.prefetch('/home');
+    router.prefetch('/maintenance');
     router.prefetch('/manualprediction');
     router.prefetch('/monitorizacion');
     router.prefetch('/generate');
     router.prefetch('/reports');
     router.prefetch('/compare');
+    router.prefetch('/management');
     router.prefetch('/alerts');
   },[])
 
@@ -62,6 +64,9 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
     // Aquí puedes ejecutar la función personalizada que deseas al hacer clic
     if (route.name === 'Home') {
       router.push('/home');
+    }
+    if (route.name === 'Mantenciones') {
+      router.push('/maintenance');
     }
     if (route.name === 'Predicción Manual') {
       router.push('/manualprediction');
@@ -77,6 +82,9 @@ export function SidebarLinks(props: { routes: IRoute[]; [x: string]: any }) {
     }
     if (route.name === 'Comparar') {
       router.push('/compare');
+    }
+    if (route.name === 'Gestión') {
+      router.push('/management');
     }
     if (route.name === 'Alertas') {
       router.push('/alerts');
