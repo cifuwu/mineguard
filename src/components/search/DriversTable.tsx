@@ -51,10 +51,13 @@ import {
 } from '@tanstack/react-table';
 import { MdDelete, MdEdit } from "react-icons/md";
 
+const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
+
 type RowObj = {
+  _id: string;
   name: string;
-  number: string;
-  type: string;
+  contactNumber: string;
+  userType: string;
 };
 
 export default function AlertsTable(props: { tableData: RowObj[] }) {
@@ -90,21 +93,64 @@ export default function AlertsTable(props: { tableData: RowObj[] }) {
     }
 
     const handleAccept = () => {
-        if (!editRowDataRef.current.name || !editRowDataRef.current.number || !editRowDataRef.current.type) {
+        if (!editRowDataRef.current.name || !editRowDataRef.current.contactNumber || !editRowDataRef.current.userType) {
             setAlertMessage('Por favor, rellena todos los campos para editar un registro.');
             return;
         } else {
             setAlertMessage('');
         }
         if (editRowIndex !== null && editRowDataRef) {
-            const updatedData = [...data];
-            updatedData[editRowIndex] = editRowDataRef.current;
-            setData(updatedData);
 
-            console.log(editRowDataRef.current);
+            console.log(editRowDataRef.current._id, editRowDataRef.current.contactNumber, editRowDataRef.current.name, editRowDataRef.current.userType);
 
-            setEditRowIndex(null);
-            editRowDataRef.current = null;
+            const requestBodyUpdateDriver = {
+                query: `
+                    mutation Mutation($driver: DriverUpdate) {
+                        updateDriver(driver: $driver)
+                    }
+                `,
+                variables: {
+                    "driver": {
+                        "_id": editRowDataRef.current._id,
+                        "contactNumber": editRowDataRef.current.contactNumber,
+                        "name": editRowDataRef.current.name,
+                        "userType": editRowDataRef.current.userType
+                    }
+                }
+            };
+            
+            // fetch UpdateDriver
+            fetch(ENDPOINT, {
+                method: "POST",
+                body: JSON.stringify(requestBodyUpdateDriver),
+                headers: {
+                "Content-Type": "application/json",
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.errors) {
+                        console.error("Error:", data.errors[0].message);
+                    }
+                    if (data && data.data && data.data.updateDriver) {
+                        console.log("Conductor actualizado exitosamente:", data.data.updateDriver);
+                        
+                        setData((prevData) => {
+                            const updatedData = [...prevData];
+                            updatedData[editRowIndex] = editRowDataRef.current;
+                            return updatedData;
+                        });
+
+                        console.log(editRowDataRef.current);
+            
+                        setEditRowIndex(null);
+                        editRowDataRef.current = null;
+                    }
+                })
+                .catch((error) => {
+                    console.log("Error:", error);
+                });
+            
         }
     }
 
@@ -121,12 +167,49 @@ export default function AlertsTable(props: { tableData: RowObj[] }) {
 
     const confirmDelete = () => {
         if (idToDelete !== null) {
-            console.log(data[idToDelete]);
-            const updatedData = data.filter((_, index) => index !== idToDelete);
-            setData(updatedData);
-            setIdToDelete(null);
-        }
-        onClose();
+
+            const requestBodyDeleteDriver = {
+                query: `
+                    mutation Mutation($id: ID) {
+                        deleteDriver(_id: $id)
+                    }
+                `,
+                variables: {
+                    "id": data[idToDelete]?._id
+                }
+            };
+            
+            // fetch UpdateDriver
+            fetch(ENDPOINT, {
+                method: "POST",
+                body: JSON.stringify(requestBodyDeleteDriver),
+                headers: {
+                "Content-Type": "application/json",
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.errors) {
+                        console.error("Error:", data.errors[0].message);
+                    }
+                    if (data && data.data && data.data.deleteDriver) {
+                        console.log("Conductor eliminado exitosamente:", data.data.deleteDriver);
+                        
+                        setData((prevData) => {
+                            console.log(prevData[idToDelete]);
+                            const updatedData = prevData.filter((_, index) => index !== idToDelete);
+                            return updatedData;
+                        });
+
+                        onClose();
+                        setIdToDelete(null);
+                    }
+                })
+                .catch((error) => {
+                    console.log("Error:", error);
+                });
+
+            }
     }
 
     const [columnFilters, setColumnFilters] =
@@ -161,8 +244,8 @@ export default function AlertsTable(props: { tableData: RowObj[] }) {
                 )
             },
         }),
-        columnHelper.accessor('number', {
-            id: 'number',
+        columnHelper.accessor('contactNumber', {
+            id: 'contactNumber',
             header: () => (
                 <Text
                     justifyContent="space-between"
@@ -177,8 +260,8 @@ export default function AlertsTable(props: { tableData: RowObj[] }) {
                 const rowIndex = info.row.index;
                 return editRowIndex === rowIndex ? (
                 <Input 
-                    defaultValue={editRowDataRef.current?.number}
-                    onChange={(e) => handleInputChange('number', e.target.value)}
+                    defaultValue={editRowDataRef.current?.contactNumber}
+                    onChange={(e) => handleInputChange('contactNumber', e.target.value)}
                 />
                 ) : (
                 <Text color={textColor} fontSize="md" fontWeight="500">
@@ -187,8 +270,8 @@ export default function AlertsTable(props: { tableData: RowObj[] }) {
                 )
             },
         }),
-        columnHelper.accessor('type', {
-            id: 'type',
+        columnHelper.accessor('userType', {
+            id: 'userType',
             header: () => (
                 <Text
                     justifyContent="space-between"
@@ -203,15 +286,15 @@ export default function AlertsTable(props: { tableData: RowObj[] }) {
                 const rowIndex = info.row.index;
                 return editRowIndex === rowIndex ? (
                     <Select
-                        defaultValue={editRowDataRef.current?.type}
-                        onChange={(e) => handleInputChange('type', e.target.value)}
+                        defaultValue={editRowDataRef.current?.userType}
+                        onChange={(e) => handleInputChange('userType', e.target.value)}
                     >
                         <option value='Admin'>Admin</option>
                         <option value='User'>User</option>
                     </Select>
                 ) : (
                 <Badge
-                    colorScheme={info.getValue() === 'Admin' ? 'purple' : 'blackAlpha'}
+                    colorScheme={info.getValue() === 'admin' ? 'purple' : 'blackAlpha'}
                     fontSize="md"
                     fontWeight="500"
                     >
