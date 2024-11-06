@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { jwtVerify, decodeJwt } from 'jose';
 
 export async function middleware(req) {
-    return;
+
     if (process.env.START_MODE === 'development') {
         return NextResponse.next();
     }
