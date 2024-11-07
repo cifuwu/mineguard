@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { Box, Button, Flex, HStack, Input, VStack, Text, Spacer, useColorModeValue } from '@chakra-ui/react';
+import { Box, Image, Button, Flex, HStack, Input, VStack, Text, Spacer, useColorModeValue } from '@chakra-ui/react';
 import L from 'leaflet';
 import { GiMineTruck } from 'react-icons/gi';
 import ReactDOMServer from 'react-dom/server';
@@ -68,6 +68,7 @@ const TruckMap = () => {
       }));
 
       setTrucks(trucksArray);
+      console.log(trucksArray);
 
     };
 
@@ -112,7 +113,7 @@ const TruckMap = () => {
         borderRadius="15px" 
       > 
         <MapContainer 
-          center={[-33.0458, -71.6197]} 
+          center={[-24.26236378384671, -69.07266779893797]} 
           zoom={14} 
           style={{ height: '100%', width: '100%', borderRadius: '15px' }}
         >
@@ -127,7 +128,10 @@ const TruckMap = () => {
                 <Popup>
                   
                   {/*Texto del popup*/ }
-                  <Text>{`${truck.name} - ${truck.serie}`}</Text>
+                  <Text as="b"> {`${truck.model} - ${truck.serie}`}</Text>
+                  <Text>Conductor: {`${truck.driver}`}</Text>
+                  <Text>Número de telefono: {`${truck.contactNumber}`} </Text>
+                  <Image src={truck.imgurl} />
 
                   <Button
                     size="sm"
