@@ -8,19 +8,23 @@ import { GiMineTruck } from 'react-icons/gi';
 import ReactDOMServer from 'react-dom/server';
 import Card from "components/card/Card";
 
+
+const SOCKET_URL = process.env.NEXT_PUBLIC_ENDPOINT_MAP;
+
+
+
 interface Truck {
   id: number;
   name: string;
   model: string;
   serie: string;
+  driver: string;
+  contactNumber: string;
+  imgurl: string;
   position: { lat: number; lng: number };
   visible: boolean;
 }
 
-const initialData: Truck[] = [
-  { id: 1, name: 'Truck 1', model: 'T1', serie: 'A50000', position: { lat: -33.0458, lng: -71.6197 }, visible: true },
-  { id: 2, name: 'Truck 2', model: 'T2', serie: 'A50001', position: { lat: -33.0468, lng: -71.6207 }, visible: true },
-];
 
 const FollowTruck = ({ truck }: { truck: Truck | null }) => {
   const map = useMap();
@@ -38,25 +42,45 @@ const TruckMap = () => {
   const boxBorderColor = useColorModeValue('gray.200', 'navy.900');
   const boxBorderColorHighlighted = useColorModeValue('blue.500', 'brand.400');
 
-  const [trucks, setTrucks] = useState<Truck[]>(initialData);
+  const [trucks, setTrucks] = useState<Truck[]>([]);
   const [followedTruck, setFollowedTruck] = useState<Truck | null>(null);
   const [highlightedTruck, setHighlightedTruck] = useState<Truck | null>(null);
   const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTrucks(prevTrucks =>
-        prevTrucks.map(truck => ({
-          ...truck,
-          position: {
-            lat: truck.position.lat + (Math.random() - 0.5) * 0.001,
-            lng: truck.position.lng + (Math.random() - 0.5) * 0.001,
-          },
-        }))
-      );
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+
+  useEffect(()=>{
+    const socket = new WebSocket(`${SOCKET_URL}`);
+
+    socket.onmessage = (event) => {
+      const data = event.data;
+      const msg = JSON.parse(data);
+
+      const trucksArray: Truck[] = Object.values(msg.trucks).map((truck: any, index) => ({
+        id: index + 1,
+        name: truck.driver,
+        model: truck.model,
+        serie: truck.truck_id,
+        driver: truck.driver,
+        contactNumber: truck.contactNumber,
+        imgurl: truck.imgurl,
+        position: { lat: truck.lat, lng: truck.lon },
+        visible: true, 
+      }));
+
+      setTrucks(trucksArray);
+
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket cerrado');
+    };
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  },[])
+
+
 
   const truckIcon = (highlight: boolean) =>
     L.divIcon({
