@@ -51,7 +51,7 @@ const TruckMonitoringGraphs = () => {
         variables: msg.variables
       };
 
-      //console.log(truckData);
+      console.log(truckData);
 
       setSelectedTruckData(truckData);
     };
