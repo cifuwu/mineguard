@@ -1,3 +1,4 @@
+'use client'
 // chakra imports
 import {
   Avatar,

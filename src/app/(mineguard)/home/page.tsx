@@ -6,6 +6,7 @@ import L from 'leaflet';
 import { GiMineTruck } from 'react-icons/gi';
 import ReactDOMServer from 'react-dom/server';
 import Card from "components/card/Card";
+import { useRouter } from 'next/navigation';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_ENDPOINT_MAP;
 
@@ -36,6 +37,7 @@ const TruckMap = () => {
   const boxColor = useColorModeValue('white', 'navy.900');
   const boxBorderColor = useColorModeValue('gray.200', 'navy.900');
   const boxBorderColorHighlighted = useColorModeValue('blue.500', 'brand.400');
+  const router = useRouter();
 
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [followedTruck, setFollowedTruck] = useState<Truck | null>(null);
@@ -50,8 +52,9 @@ const TruckMap = () => {
       const data = event.data;
       const msg = JSON.parse(data);
 
+      console.log(msg);
+
       if (!isInitialized) {
-        console.log('ENTRÓOOOO'); // Confirmación de inicialización
         const trucksArray: Truck[] = Object.values(msg.trucks).map((truck: any, index) => ({
           id: index + 1,
           name: truck.driver,
@@ -65,18 +68,19 @@ const TruckMap = () => {
         }));
 
         setTrucks(trucksArray);
-        isInitialized = true; // Marca como inicializado localmente
+        isInitialized = true; 
       } else {
         const updatedTrucks = Object.values(msg.trucks) as Truck[];
 
         setTrucks((prevTrucks) =>
           prevTrucks.map((truck) => {
-            const updatedTruck = updatedTrucks.find((t) => t.serie === truck.serie);
+            const updatedTruck = msg.trucks[truck.serie];
             return updatedTruck
-              ? { ...truck, position: { lat: updatedTruck.position.lat, lng: updatedTruck.position.lng } }
+              ? { ...truck, position: { lat: updatedTruck.lat, lng: updatedTruck.lon } }
               : truck;
           })
         );
+        
       }
     };
 
@@ -148,7 +152,7 @@ const TruckMap = () => {
                     mt={2}
                     boxShadow="sm" 
                     onClick={() => {
-                      window.location.href = `/devMonChart?serie=${truck.serie}`;    
+                      router.push(`/devMonChart?serie=${truck.serie}`);
                     }}
                   >
                     Monitorear
@@ -160,7 +164,7 @@ const TruckMap = () => {
                     ml={2}
                     boxShadow="sm" 
                     onClick={() => {
-                      window.location.href = `/manualAlerts?serie=${truck.serie}`;
+                      router.push(`/manualAlerts?serie=${truck.serie}`);
                     }}
                   >
                     Alertar

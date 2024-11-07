@@ -1,3 +1,4 @@
+'use client'
 import { IRoute } from 'types/navigation';
 import Router from 'next/router';
 
