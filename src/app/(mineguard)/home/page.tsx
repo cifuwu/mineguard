@@ -1,5 +1,4 @@
-'use client';
-
+'use client'
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Box, Image, Button, Flex, HStack, Input, VStack, Text, Spacer, useColorModeValue } from '@chakra-ui/react';
@@ -8,10 +7,7 @@ import { GiMineTruck } from 'react-icons/gi';
 import ReactDOMServer from 'react-dom/server';
 import Card from "components/card/Card";
 
-
 const SOCKET_URL = process.env.NEXT_PUBLIC_ENDPOINT_MAP;
-
-
 
 interface Truck {
   id: number;
@@ -24,7 +20,6 @@ interface Truck {
   position: { lat: number; lng: number };
   visible: boolean;
 }
-
 
 const FollowTruck = ({ truck }: { truck: Truck | null }) => {
   const map = useMap();
@@ -46,30 +41,43 @@ const TruckMap = () => {
   const [followedTruck, setFollowedTruck] = useState<Truck | null>(null);
   const [highlightedTruck, setHighlightedTruck] = useState<Truck | null>(null);
   const [filter, setFilter] = useState('');
+  let isInitialized = false; // Variable auxiliar para manejar la inicialización
 
-
-  useEffect(()=>{
+  useEffect(() => {
     const socket = new WebSocket(`${SOCKET_URL}`);
 
     socket.onmessage = (event) => {
       const data = event.data;
       const msg = JSON.parse(data);
 
-      const trucksArray: Truck[] = Object.values(msg.trucks).map((truck: any, index) => ({
-        id: index + 1,
-        name: truck.driver,
-        model: truck.model,
-        serie: truck.truck_id,
-        driver: truck.driver,
-        contactNumber: truck.contactNumber,
-        imgurl: truck.imgurl,
-        position: { lat: truck.lat, lng: truck.lon },
-        visible: true, 
-      }));
+      if (!isInitialized) {
+        console.log('ENTRÓOOOO'); // Confirmación de inicialización
+        const trucksArray: Truck[] = Object.values(msg.trucks).map((truck: any, index) => ({
+          id: index + 1,
+          name: truck.driver,
+          model: truck.model,
+          serie: truck.truck_id,
+          driver: truck.driver,
+          contactNumber: truck.contactNumber,
+          imgurl: truck.imgurl,
+          position: { lat: truck.lat, lng: truck.lon },
+          visible: true,
+        }));
 
-      setTrucks(trucksArray);
-      console.log(trucksArray);
+        setTrucks(trucksArray);
+        isInitialized = true; // Marca como inicializado localmente
+      } else {
+        const updatedTrucks = Object.values(msg.trucks) as Truck[];
 
+        setTrucks((prevTrucks) =>
+          prevTrucks.map((truck) => {
+            const updatedTruck = updatedTrucks.find((t) => t.serie === truck.serie);
+            return updatedTruck
+              ? { ...truck, position: { lat: updatedTruck.position.lat, lng: updatedTruck.position.lng } }
+              : truck;
+          })
+        );
+      }
     };
 
     socket.onclose = () => {
@@ -79,9 +87,11 @@ const TruckMap = () => {
     socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
-  },[])
 
-
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   const truckIcon = (highlight: boolean) =>
     L.divIcon({
@@ -126,7 +136,6 @@ const TruckMap = () => {
                 icon={truckIcon(truck.id === highlightedTruck?.id)}
               >
                 <Popup>
-                  
                   {/*Texto del popup*/ }
                   <Text as="b"> {`${truck.model} - ${truck.serie}`}</Text>
                   <Text>Conductor: {`${truck.driver}`}</Text>
