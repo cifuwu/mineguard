@@ -1,16 +1,14 @@
-'use client'
+'use client';
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import type { FC } from "react";
 
-const MapPage = () => {
-  const TruckMap = useMemo(() => dynamic(
-    () => import("components/map/TruckMap"),
-    {
-      loading: () => <p>El mapa está cargando...</p>,
-      ssr: false
-    }
-  ), [])
+const TruckMap = dynamic(() => import("components/map/TruckMap"), {
+  loading: () => <p>El mapa está cargando...</p>,
+  ssr: false,
+}) as FC;
+
+const MapPage: FC = () => {
   return (
     <div>
       <TruckMap />

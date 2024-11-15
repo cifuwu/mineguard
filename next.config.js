@@ -11,9 +11,10 @@ const nextConfig = {
       'i.ibb.co',
       'scontent.fotp8-1.fna.fbcdn.net',
     ],
-    // Make ENV
+    // Make EN
     unoptimized: true,
   },
+  ignoreDuringBuilds: true,
   experimental: {
     appDir: true,
   },

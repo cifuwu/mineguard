@@ -103,8 +103,8 @@ const DevelopPage = () => {
   }, []);
 
   useEffect(() => {
-    const initialDate = "2024-08-28";
-    const lastDate = "2024-10-01";
+    const initialDate = "2024-01-01";
+    const lastDate = "2025-12-30";
 
     // getTrucksInfo RequestBody
     const requestBody = {

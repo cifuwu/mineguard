@@ -102,12 +102,5 @@
     "eslint-config-next": "^13.2.1",
     "gh-pages": "^6.1.1",
     "npm-force-resolutions": "^0.0.10"
-  },
-  "resolutions": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "@types/react": "18.0.0",
-    "@types/react-dom": "18.0.0",
-    "react-error-overlay": "6.0.9"
   }
 }
